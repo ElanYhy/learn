@@ -1,0 +1,51 @@
+DB2写法：
+<!-- 批量插入数据授权方案信息 -->
+	<insert id="batchInsertDtAthrPln" parameterType="java.util.List" useGeneratedKeys="false" flushCache="false">
+		INSERT  INTO CDATA.T_DT_ATHR_PLN(
+		DT_ATHR_PLN_ID,
+		DT_ATHR_PLN_NM,
+		DT_ATHR_PLN_TYP_CD,
+		DT_ATHR_PLN_DFN,
+		ASSC_DMNS_TYP_CD,
+		WHTH_ALL_ATHR,
+		DT_ATHR_PLN_DSCR
+		)
+		<foreach collection="list" item="item" index="index" open="(" close=")" separator="union">
+		SELECT
+		#{item.dtAthrPlnId},
+		#{item.dtAthrPlnNm},
+		#{item.dtAthrPlnTypCd},
+		#{item.dtAthrPlnDfn},
+		#{item.asscDmnsTypCd},
+		#{item.withAllAthr},
+		#{item.dtAthrPlnDscr}
+		FROM SYSIBM.SYSDUMMY1
+		</foreach>
+		
+		
+Oracle写法：
+	 <!-- 批量插入数据授权方案信息 -->
+    <insert id="batchInsertDtAthrPln" parameterType="java.util.List" useGeneratedKeys="false" flushCache="false">
+    	INSERT ALL
+        <foreach item="item" index="index" collection="list">
+        INSERT INTO CDATA.T_DT_ATHR_PLN(
+    		DT_ATHR_PLN_ID,
+    		DT_ATHR_PLN_NM,
+    		DT_ATHR_PLN_TYP_CD,
+    		DT_ATHR_PLN_DFN,
+    		ASSC_DMNS_TYP_CD,
+    		WHTH_ALL_ATHR,
+    		DT_ATHR_PLN_DSCR
+    	) 
+    	VALUES(
+    		#{dtAthrPlnId},
+    		#{dtAthrPlnNm},
+    		#{dtAthrPlnTypCd},
+    		#{dtAthrPlnDfn},
+    		#{asscDmnsTypCd},
+    		#{withAllAthr},
+    		#{dtAthrPlnDscr}
+    	)
+        </foreach>
+        SELECT 1 FROM DUAL
+    </insert>

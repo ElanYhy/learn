@@ -1,0 +1,27 @@
+《jsp》
+编码：
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+pageEncoding是jsp文件本身的编码
+contentType的charset是指服务器发送给客户端时的内容编码
+	例：
+	<%--不设置charset=UTF-8 pageEncoding="UTF-8"会导致中文乱码--%>
+	<%
+		out.println("IP地址：" + request.getRemoteAddr());
+	%>
+	<%--不设置 pageEncoding="UTF-8" 会导致输出英文时间--%>
+	<p>时间：<%=(new java.util.Date()).toLocaleString()%></p>
+
+
+变量声明：
+	<%! int i = 1; String s = "haha";%>
+代码块：
+	<%out.println(i+s);%>
+表达式：
+	<%=(new java.util.Date()).toLocaleString()%>
+	
+el表达式不起作用：
+	${requestScope.name} 取值失败 
+	原因：配置<%@page isELIgnored="false" %>  不忽略el表达式
+		isELIgnored的值取决于web应用部署描述符的版本。使用Servlet2.4的描述符的JSP页面默认是解析EL表达式，
+		即表达式有效。这默认提供了大部分应用想要的情况。而使用Servlet2.3或者更早的描述符的JSP页面默认是
+		忽略EL表达式的，即不解析EL表达式，这样就提供了向后兼容性。

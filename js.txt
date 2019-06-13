@@ -1,0 +1,515 @@
+JS:
+https://www.cnblogs.com/bhan/p/6802644.html
+apply call?
+	apply()方法 接收两个参数，一个是函数运行的作用域（this），另一个是参数数组。 apply([thisObj [,argArray] ]);
+	call()方法 第一个参数和apply()方法的一样，但是传递给函数的参数必须列举出来。 call([thisObject[,arg1 [,arg2 [,...,argn]]]]);
+
+
+
+
+	1. 每个函数都包含两个非继承而来的方法：call()方法和apply()方法。
+	2. 相同点：这两个方法的作用是一样的。
+	都是在特定的作用域中调用函数，等于设置函数体内this对象的值，以扩充函数赖以运行的作用域。
+
+	一般来说，this总是指向调用某个方法的对象，但是使用call()和apply()方法时，就会改变this的指向。
+
+
+	apply 方法能劫持(<<Ajax in Action>> 书中用到"劫持"一语，很生动啊)另外一个对象的方法， 
+
+
+
+
+
+	  Math.max 可以实现得到数组中最大的一项
+
+	因为Math.max 参数里面不支持Math.max([param1,param2]) 也就是数组
+
+	但是它支持Math.max(param1,param2,param3…),所以可以根据刚才apply的那个特点来解决 var max=Math.max.apply(null,array),这样轻易的可以得到一个数组中最大的一项(apply会将一个数组装换为一个参数接一个参数的传递给方法)
+
+			 这块在调用的时候第一个参数给了一个null,这个是因为没有对象去调用这个方法,我只需要用这个方法帮我运算,得到返回的结果就行,.所以直接传递了一个null过去
+			 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+$.ajax  ?
+	async 默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+	
+	$.ajax({
+		url:'http://www.baidu.com',
+		type:'POST',
+		data:data,
+		cache:true,
+		headers:{},
+		beforeSend：function(){},
+		success:function(){},
+		error:function(){},
+		complete:function(){}
+	}); 
+
+
+
+sessionStorage 、localStorage 和 cookie 之间的区别?
+	 共同点：用于浏览器端存储的缓存数据
+
+	不同点：
+
+	(1)、存储内容是否发送到服务器端：当设置了Cookie后，数据会发送到服务器端，造成一定的宽带浪费；
+
+	        web storage,会将数据保存到本地，不会造成宽带浪费；
+
+	(2)、数据存储大小不同：Cookie数据不能超过4K,适用于会话标识；web storage数据存储可以达到5M;
+
+	(3)、数据存储的有效期限不同：cookie只在设置了Cookid过期时间之前一直有效，即使关闭窗口或者浏览器；
+
+	        sessionStorage,仅在关闭浏览器之前有效；localStorage,数据存储永久有效；
+
+	(4)、作用域不同：cookie和localStorage是在同源同窗口中都是共享的；sessionStorage不在不同的浏览器窗口中共享，即使是同一个页面；
+	
+	
+	每个浏览器对localstorage的支持大小是不一样的，chrome是5M ，IE10是1630K你可以用下面的js匿名函数测试不同浏览器对localstorage的支持大小
+	(function() {
+    if(!window.localStorage) {
+        console.log('当前浏览器不支持localStorage!')
+    }    
+    var test = '0123456789';
+    var add = function(num) {
+        num += num;
+        if(num.length == 10240) {
+            test = num;
+            return;
+        }
+        add(num);
+    }
+    add(test);
+    var sum = test;
+    var show = setInterval(function(){
+        sum += test;
+        try {
+            window.localStorage.removeItem('test');
+            window.localStorage.setItem('test', sum);
+            console.log(sum.length / 1024 + 'KB');
+        } catch(e) {
+            alert(sum.length / 1024 + 'KB超出最大限制');
+            clearInterval(show);
+        }
+		}, 0.1)
+	})()
+	
+	
+	
+	
+$(document).ready()方法和window.onload有什么区别？
+	 (1)、window.onload方法是在网页中所有的元素(包括元素的所有关联文件)完全加载到浏览器后才执行的。
+
+	 (2)、$(document).ready() 方法可以在DOM载入就绪时就对其进行操纵，并调用执行绑定的函数
+
+	
+	
+delegate()会在以下两个情况下使用到：
+
+ 1、如果你有一个父元素，需要给其下的子元素添加事件，这时你可以使用delegate()了，代码如下：
+
+	$("ul").delegate("li", "click", function(){ $(this).hide(); });
+ 2、当元素在当前页面中不可用时，可以使用delegate()
+
+
+JQuery有几种选择器?
+	(1)、基本选择器：#id，class,element,*;
+
+	(2)、层次选择器：parent > child，prev + next ，prev ~ siblings
+
+	(3)、基本过滤器选择器：:first，:last ，:not ，:even ，:odd ，:eq ，:gt ，:lt
+
+	(4)、内容过滤器选择器： :contains ，:empty ，:has ，:parent
+
+	(5)、可见性过滤器选择器：:hidden ，:visible
+
+	(6)、属性过滤器选择器：[attribute] ，[attribute=value] ，[attribute!=value] ，[attribute^=value] ，[attribute$=value] ，[attribute*=value]
+
+	(7)、子元素过滤器选择器：:nth-child ，:first-child ，:last-child ，:only-child
+
+	(8)、表单选择器： :input ，:text ，:password ，:radio ，:checkbox ，:submit 等；
+
+	(9)、表单过滤器选择器：:enabled ，:disabled ，:checked ，:selected
+
+
+$(this) 和 this 关键字在 jQuery 中有何不同？
+	$(this) 返回一个 jQuery 对象，你可以对它调用多个 jQuery 方法，比如用 text() 获取文本，用val() 获取值等等。
+
+	而 this 代表当前元素，它是 JavaScript 关键词中的一个，表示上下文中的当前 DOM 元素。你不能对它调用 jQuery 方法，直到它被 $() 函数包裹，例如 $(this)。
+
+js单例模式：
+	保证一个类仅有一个实例，并提供一个访问它的全局访问点
+	实现？
+		闭包配合立即执行函数
+		https://www.cnblogs.com/yonglin/p/8080836.html
+	单例常用场景？
+	　　只需要生成一个唯一对象的时候，比如说页面登录框，只可能有一个登录框，那么你就可以用单例的思想去实现他，
+		当然你不用单例的思想实现也行，那带来的结果可能就是你每次要显示登陆框的时候都要重新生成一个登陆框并显示（耗费性能），或者是不小心显示出了两个登录框
+	
+	
+定义函数的方式有两种?
+	一种是函数声明，一种是函数表达式(匿名函数)
+	
+立即执行函数?
+	立即执行函数的两种常见形式：
+		( function(){…} )()和( function (){…} () )，一个是一个匿名函数包裹在一个括号运算符中，后面再跟一个小括号，另一个是一个匿名函数后面跟一个小括号，然后整个包裹在一个括号运算符中，这两种写法是等价的。
+		要想立即执行函数能做到立即执行，要注意两点，一是函数体后面要有小括号()，二是函数体必须是函数表达式而不能是函数声明
+	使用立即执行函数的好处:
+		通过定义一个匿名函数，创建了一个新的函数作用域，相当于创建了一个“私有”的命名空间，该命名空间的变量和方法，不会破坏污染全局的命名空间。
+		此时若是想访问全局对象，将全局对象以参数形式传进去即可
+		
+	匿名函数的调用:
+		var abc=function(x,y){ 
+			return x+y; 
+		} 
+		alert(abc(2,3)); // “5” 
+
+		alert((function(x,y){return x+y;})(2,3));// "5"  
+		alert((new Function("x","y","return x*y;"))(2,3));// "6"
+		大家知道小括号的作用吗？
+			小括号能把我们的表达式组合分块，并且每一块，也就是每一对小括号，都有一个返回值。这个返回值实际上也就是小括号中表达式的返回值。
+			所以，当我们用一对小括号把匿名函数括起来的时候，实际上小括号对返回的，就是一个匿名函数的Function对象。
+			因此，小括号对加上匿名函数就如同有名字的函数般被我们取得它的引用位置了。所以如果在这个引用变量后面再加上参数列表，就会实现普通函数的调用形式。
+			--------------------- 
+			作者：clh386 
+			来源：CSDN 
+			原文：https://blog.csdn.net/clh386/article/details/78560136 
+	例子：
+	//循环里面包含闭包函数
+	function box1(){
+		var arr = [];
+		for(var i=0;i<3;i++){
+			arr[i] = function(){
+				return i;                            //由于这个闭包的关系，他是循环完毕之后才返回，最终结果是4++是5
+			}                                        //这个匿名函数里面根本没有i这个变量，所以匿名函数会从父级函数中去找i，
+		}                                            //当找到这个i的时候，for循环已经循环完毕了，所以最终会返回5
+		return arr;
+	}
+	alert(box1());                                    //执行5次匿名函数本身
+	//alert(box1()[1]);　　　　　　　　　　　　　　　　　　　//执行第2个匿名函数本身
+	//alert(box1().length);                            //最终返回的是一个数组，数组的长度为5
+	//alert(box1()[0]());                                //数组中的第一个数返回的是5，这是为什么？
+	
+	
+	
+	下面这个JS程序的输出是什么：
+
+	function Foo() {
+		var i = 0;
+		return function() {
+			console.log(i++);
+		}
+	}
+	 
+	var f1 = Foo(),
+		f2 = Foo();
+	f1();
+	f1();
+	f2();
+	
+	答案：0 1 0
+	（1）Function是引用类型：保存在堆中，变量f1,f2是保存在栈中；
+	（2）闭包：一个函数（产生新的作用域）定义的局部变量、子函数的作用域在函数内，
+			 但是一旦离开了这个函数，局部变量就无法访问，所有通过返回子函数到一个变量f1的方法，让
+			 f1指向堆中的函数作用域，这样可以使用局部变量i.
+	(3)   过程：
+	   第一次f1()  :f1=Foo()中，先执行Foo(): i = 0,return值返回给f1
+	 (f1指向子函数   f1()=function(){.....},因为子函数没有 定义i，所以向上找到父函数定义的 i:  )并执行子函数 输出i=0,再自加 i =1(覆盖了父函数Foo 的 i值);
+	  第二次f1() : 执行的是子函数 Function(){  ..},输出的是父函数 的 i=1,再自加 i =2;
+	  第一次f2():同第一次f1(),不同的是 f2指向堆中一个新的对象 function(){ ...},所有此i非彼i,输出i=0;如果
+				   如果再次f2(),那么和第二次f1(),一样输出i=1; 
+     
+	
+JS中for循环变量作用域？
+https://blog.csdn.net/kai_l/article/details/50913505	
+	js中作用域只有函数作用域和全局作用域，在函数体内使用var 定义的变量，会被提到函数开始处进行定义，作用域为整个函数,常见的误区如下
+	var a=[];
+	for(var i = 0;i<10;i++){
+	   var q = i;
+	   a[i]=function(){console.log(q)}
+	}
+	a[0]()
+		
+	其中，由于for循环并不是一个函数体，所以for循环中定义的变量q和i是作用域for循环所在的函数体，和a同级，
+	i++ 和  q=i 并不是重新定义变量，只是重复赋值，最终循环结束，i = 10,q=9;  
+	由于function(){console.log(q)} 并不是立即执行，所以这里的q一直是存储的内存引用，最终所有的a[i]()都是输出 9
+	不过，在es6中新增了let命令声明变量，用法和var类似，不过let所声明的变量，只在let命令所在的代码块有效果，for循环的计数器中就很适合let命令
+	var a=[];
+	for(let i = 0;i<10;i++){
+	   ley q = i;
+	   a[i]=function(){console.log(q)}
+	}
+	a[6]()    //这里会输出   6  let声明的变量仅在块级作用域有效，所以这里的i只在本轮循环有效果，每次循环的i其实都是一个新的变量
+
+			
+
+判断数组有哪些方法?
+	a instanceof Array
+	a.constructor == Array
+	Object.prototype.toString.call(a) == [Object Array]
+
+
+跨域通信有哪些方案，各有什么不同?
+	JSONP：由于同源策略的限制，XmlHttpRequest只允许请求当前源，script标签没有同源限制
+	通过动态<script>元素使用，使用时为src指定一个跨域url。回调函数处理JSON数据  兼容性好 不支持post
+	简述原理与过程：首先在客户端注册一个callback, 然后把callback的名字传给服务器。此时，服务器先生成一个function , function 名字就是传递上来的参数。
+	最后将 json 数据直接以入参的方式，放置到 function 中，这样就生成了一段 js 语法的文档，返回给客户端。
+	客户端浏览器，解析script标签，并执行返回的 javascript 文档，此时数据作为参数，传入到了客户端预先定义好的 callback 函数里
+	  <script> 
+	  var url = "http://localhost:8080/crcp/rcp/t99eidt/testjson.do?jsonp=callbackfunction";  
+	  var script = document.createElement('script');  
+	  script.setAttribute('src', url);  //load javascript   
+	  document.getElementsByTagName('head')[0].appendChild(script);  
+	   
+	  //回调函数 
+	   function callbackfunction(data){ 
+		var html=JSON.stringify(data.RESULTSET); 
+		alert(html); 
+	 } 
+	 ？？？？？？？？
+	 jsonp（利用script标签的跨域能力）跨域、websocket（html5的新特性，是一种新协议）跨域、
+	 设置代理服务器（由服务器替我们向不同源的服务器请求数据）、CORS（跨源资源共享，cross origin resource sharing）、
+	 iframe跨域、postMessage(包含iframe的页面向iframe传递消息
+
+
+UMD规范和ES6模块化，Commonjs的对比？
+
+	CommonJS是一个更偏向于服务器端的规范。用于NodeJS 是同步的
+
+	AMD是依赖前置的
+
+	CMD推崇依赖就近，延迟执行。可以把你的依赖写进代码的任意一行
+
+	AMD和CMD都是用difine和require，但是CMD标准倾向于在使用过程中提出依赖，就是不管代码写到哪突然发现需要依赖另一个模块，那就在当前代码用require引入就可以了，规范会帮你搞定预加载，你随便写就可以了。但是AMD标准让你必须提前在头部依赖参数部分写好（没有写好？ 倒回去写好咯）。这就是最明显的区别。
+
+	UMD写一个文件需要兼容不同的加载规范
+
+	ES6通过import、export实现模块的输入输出。其中import命令用于输入其他模块提供的功能，export命令用于规定模块的对外接口。
+	
+什么是 MVVM , 和 MVC 是什么区别, 原理是什么?
+　　mvc的界面和逻辑关联紧密，数据直接从数据库读取，必须通过Controller来承上启下，通信都是单向的。
+	mvvm的View 和 ViewModel可以互相通信，界面数据从viewmodel中获取。
+
+
+JS中的prototype、__proto__与constructor？
+	https://blog.csdn.net/cc18868876837/article/details/81211729
+	1、我们需要牢记两点：①__proto__和constructor属性是对象所独有的；② prototype属性是函数所独有的，因为函数也是一种对象，所以函数也拥有__proto__和constructor属性。
+	2、__proto__属性的作用就是当访问一个对象的属性时，如果该对象内部不存在这个属性，那么就会去它的__proto__属性所指向的那个对象（父对象）里找，一直找，
+		直到__proto__属性的终点null，然后返回undefined，通过__proto__属性将对象连接起来的这条链路即我们所谓的原型链。
+	3、prototype属性的作用就是让该函数所实例化的对象们都可以找到公用的属性和方法，即f1.__proto__ === Foo.prototype。
+	4、constructor属性的含义就是指向该对象的构造函数，所有函数（此时看成对象了）最终的构造函数都指向Function。
+	<script>
+		function myFunction(){
+			var fruits = ["Banana", "Orange", "Apple", "Mango"];
+			fruits.t1();
+
+		}
+		Array.prototype.t1 = function(){
+				var x=document.getElementById("demo");
+				x.innerHTML=this.valueOf();
+		}
+	</script>
+
+事件委托?
+	不在事件的发生地设立监听函数，而是在事件发生地的父元素或者祖先元素设置监听器函数，这样可以大大提高性能，因为可以减少绑定事件的元素
+	
+	
+(0, eval)(‘this’) ?
+	https://www.cnblogs.com/qianlegeqian/p/3950044.html
+	这里用了逗号操作符，逗号操作符总会返回表达式中的最后一项，所以0在这里基本上没有什么用，换成其他任意数值均可
+	然后通过”()”来立即执行这个表达式，返回eval
+	为eval传入’this’字符串，然后被当做实际的ECMAScript语句来解析
+	作用：
+		因为在严格模式（"use strict"）下，匿名函数中的this为undefined
+		为了防止在严格模式下window变量被赋予undefined，使用(0, eval)(‘this’)就可以把this重新指向window对象
+
+	eval() 函数可计算某个字符串，并执行其中的的 JavaScript 代码。
+	间接调用计算出来的是一个值，而不是引用
+	如ECMAScript所说，这是因为两个操作符 - （例子(1,eval)里的）逗号操作符和(例子(eval=eval)里的)等号操作符-对它的操作数执行了GetValue。
+	因此，(1,eval)和(eval = eval)计算出一个值，而eval 和 (eval)计算出的是一个引用。
+	
+	
+	
+$('xx')[0].files[0]是什么意思？
+
+	
+	①首先得明白jQuery对象只能使用jQuery对象的属性和方法，JavaScript对象只能使用JavaScript对象的属性和方法；
+
+	②files[0]是JavaScript的属性；
+
+	③$('xx')是jQuery对象，$('xx')[0]是将jQuery对象：$('xx')转换为JavaScript对象，这样才可以使用JavaScript对象的属性和方法；
+
+	④我们再看这行代码的背景，HTML5支持multiple属性，即<input type="file">可能会添加multiple属性并赋值：multiple="multiple"，即<input type="file" multiple="multiple">，这样一次性可同时上传多张图片，所以获得一张图片的方法就是：$('xx')[0].files[0]
+
+	⑤扩展：
+
+	$('xx')[0].files[0].size可获得文件的大小，单位是字节（B），使用$('xx')[0].files[0].size可用于判断文件的大小。
+	
+	
+	
+js中‘0’到底是 true 还是 false ?
+	if ('0') alert("'0' is true");
+	if ('0' == false) alert("'0' is false");结果是，两次都 alert 了！那么 '0' 到底是 true 还是 false 呢？
+
+	答案是：在js做比较的时候，有这样的三条规则：
+	如果比较的两者中有boolean，会把 boolean 先转换为对应的 number，即 0 和 1(false是0,1是true)
+	如果比较的双方中有一方为number一方为string，会把string转换为数字
+	把string直接转换为boolean的时候，空字符串‘’转换为 false，除此外的一切字符串转换为 true
+
+
+AJAX 教程?
+	AJAX = Asynchronous JavaScript and XML（异步的 JavaScript 和 XML）。
+	AJAX 不是新的编程语言，而是一种使用现有标准的新方法。
+	AJAX 最大的优点是在不重新加载整个页面的情况下，可以与服务器交换数据并更新部分网页内容。
+	AJAX 不需要任何浏览器插件，但需要用户允许JavaScript在浏览器上执行。
+
+	<!DOCTYPE html>
+	<html>
+	<head>
+	<meta charset="utf-8">
+	<script>
+	function loadXMLDoc()
+	{
+		var xmlhttp;
+		if (window.XMLHttpRequest)
+		{
+			//  IE7+, Firefox, Chrome, Opera, Safari 浏览器执行代码
+			xmlhttp=new XMLHttpRequest();
+		}
+		else
+		{
+			// IE6, IE5 浏览器执行代码
+			xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+		}
+		xmlhttp.onreadystatechange=function()
+		{
+			if (xmlhttp.readyState==4 && xmlhttp.status==200)
+			{
+				document.getElementById("myDiv").innerHTML=xmlhttp.responseText;
+			}
+		}
+		xmlhttp.open("GET","/try/ajax/ajax_info.txt",true);
+		xmlhttp.send();
+	}
+	</script>
+	</head>
+	<body>
+
+	<div id="myDiv"><h2>使用 AJAX 修改该文本内容</h2></div>
+	<button type="button" onclick="loadXMLDoc()">修改内容</button>
+
+	</body>
+	</html>
+	
+	
+Axios?
+	axios({
+		method: 'post',
+		url: '/user/12345',
+		data: {
+			firstName: 'Fred',
+			lastName: 'Flintstone'
+		}
+	})
+	.then(function (response) {
+		console.log(response);
+	})
+	.catch(function (error) {
+		console.log(error);
+	});
+
+----------------------------------------------------------------------------------------------------------------
+
+Object.defineProperty()？
+	Object.defineProperty() 方法会直接在一个对象上定义一个新属性，或者修改一个对象的现有属性， 并返回这个对象。
+	
+比较两个值是否相等？
+	ES5 比较两个值是否相等，只有两个运算符：相等运算符（==）和严格相等运算符（===）。它们都有缺点，前者会自动转换数据类型，后者的NaN不等于自身，以及+0等于-0。
+	ES6 提出“Same-value equality”（同值相等）算法，用来解决这个问题。Object.is就是部署这个算法的新方法。
+	它用来比较两个值是否严格相等，与严格比较运算符（===）的行为基本一致。不同之处只有两个：一是+0不等于-0，二是NaN等于自身。
+	
+	ES5 可以通过下面的代码，部署Object.is。
+	Object.defineProperty(Object, 'is', {
+	  value: function(x, y) {
+		if (x === y) {
+		  // 针对+0 不等于 -0的情况
+		  return x !== 0 || 1 / x === 1 / y;
+		}
+		// 针对NaN的情况
+		return x !== x && y !== y;
+	  },
+	  configurable: true,
+	  enumerable: false,
+	  writable: true
+	});
+	
+	
+	
+100 以内随机的自然数?
+	Math.floor(Math.random() * 100) + 1;
+	
+	
+MVVM？
+	MVVM是Model-View-ViewModel的缩写。
+	MVVM的设计思想：关注Model的变化，让MVVM框架去自动更新DOM的状态，从而把开发者从操作DOM的繁琐步骤中解脱出来！
+	
+	
+	
+	
+addEvenListener	
+	 addEvenListener方法第三参数是包裹层触发问题 估计执行顺序是先由外向里边执行判断监听参数是否为true，是就立即执行 。
+	 false就先放过。 直到点击触发的那个元素才开始由里向外执行未执行的事件
+	
+	
+	
+	
+
+在html中通过<a>标签打开一个链接，通过 <a> 标签的 target 属性规定在何处打开链接文档。
+如果在标签<a>中写入target属性，则浏览器会根据target的属性值去打开与其命名或名称相符的 框架<frame>或者窗口.
+在target中还存在四个保留的属性值如下，
+_blank	在新窗口中打开被链接文档。
+_self	默认。在相同的框架中打开被链接文档。
+_parent	在父框架集中打开被链接文档。
+_top	在整个窗口中打开被链接文档。
+framename	在指定的框架中打开被链接文档。
+	
+title、alt？
+	title作为属性时，用来为元素提供额外说明信息。例如，给超链接标签a添加了title属性，把鼠标移动到该链接上面是，就会显示title的内容，以达到补充说明或者提示的效果。 
+	而alt属性则是用来指定替换文字，只能用在img、area和input元素中（包括applet元素），用于网页中图片无法正常显示时给用户提供文字说明使其了解图像信息。
+	
+js样式？	
+	在使用点运算符时，浏览器看到“-”就没法正确解析了，在那种情况下，只能将该变量使用驼峰命名法来表示。
+	而使用方括号表示法，"-"被理解为字符串中的内容，该字符串能被正确解析。
+	eg:
+	inputElement.style.backgroundColor = 'red'; // 这是没问题的
+	inputElement.style.background-color = 'red'; // 这是错的，浏览器看不懂啊...
+	inputElement.style["background-color"] = 'red'; // 这也是可以的
+	
+	
+	
+	
+“ECMA中所有函数的参数都是按值传递的”。
+	var bb = 1;
+	function aa(bb) {
+		bb = 2;
+		alert(bb);
+	};
+	aa(bb);
+	alert(bb);
+	答案：2 1
+	值传递：把把一个值类型（也叫基本类型）传递给另一个变量时，其实是分配了一块新的存储空间，因此就本题来说，在内部改变这个值时，其实在函数外部对这个值没有影响。
+	
+	
+严格模式与混杂模式？
+1.<!DOCTYPE> 声明位于文档中的最前面，处于 <html> 标签之前。告知浏览器的解析器，用什么文档类型 规范来解析这个文档。
+2.严格模式的排版和 JS 运作模式是 以该浏览器支持的最高标准运行。在混杂模式中，页面以宽松的向后兼容的方式显示。模拟老式浏览器的行为以防止站点无法工作。
+3.DOCTYPE不存在或格式不正确会导致文档以混杂模式呈现。	
+4.HTML5 没有 DTD ，因此也就没有严格模式与混杂模式的区别，HTML5 有相对宽松的语法，实现时，已经尽可能大的实现了向后兼容。
+	
+	

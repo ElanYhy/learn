@@ -1,0 +1,197 @@
+vue 实例》》》》》》》》》
+    var app = new Vue({
+        el:'#app',
+        data:{
+            // content:'helloword!'
+            list:["111","222"],
+            inval:""
+        },
+		template："<h1>{{content}}</h1>",
+        methods:{
+            btnclick: function(){
+                // alert(this.inval)
+
+                // this.list.push(this.inval); //三种操作data内变量方式
+                // app.$data.list.push(this.inval);
+                app.list.push(this.inval);
+
+                this.inval="";
+            }
+        }
+    });
+
+
+
+挂载点、模板、实例》》》》》》
+
+	挂载点：el:"#id"
+	模板：挂载点中的部分，也可以放在实例template中。没有定义template时会去挂载点找。template下只能有一个根标签
+	new Vue({});
+	
+{{}} //插值表达式 内部为js表达式
+v-text //不转义 内部为js表达式
+v-html //转义 内部为js表达式
+
+v-on:click   等价于 @click//事件绑定
+v-bind:title="inval"  等价于 :title="inval"  <!-- 属性 绑定--> //绑定title 单向
+v-model="inval"   //双向 数据 绑定
+v-slot:header 可以被重写为 #header
+
+v-if //false时会从dom上清除对应元素 是否存在
+v-show //false时设置display：none  是否显示
+
+v-for="(item,index) in list" :key="index"  //key不可重复
+
+实现 fullname = firstname +lastname》》》
+	computed:计算属性--计算属性的结果会被缓存，除非依赖的响应式属性变化才会重新计算
+	watch：监听器--拥有缓存功能，代码相对复杂
+	methods：自定义函数--不具备缓存
+
+组件和实例的关系》》》》》
+	每个组件也是一个vue实例
+
+	
+Vue子组件data必须是函数的理解》》》》》》》》》
+	在组件中，因为可能在多处调用同一组件，为了不让多处的组件共享同一data对象，只能返回函数。
+	为了理解这种机制，我们假设data为一个对象，那么这同一个对象有可能被很多实例共享，一个实例改变其它也会跟着变，这明显是不对的。
+	而通过data函数，每新建一个实例，都会调用data来return一组新的原始数据。
+	
+父组件子组件之间通过属性传值。
+	父》子：通过props传递数据，关键点--父：v-bind: ="inval" 子: props['inval']  
+			单向数据流：子组件不要修改父组件传来的参数,可以克隆一个副本************
+			
+	子》父：通过自定义事件（发布订阅模式），关键点--父：@del="delli" 子: this.$emit("del",index)   
+				//delli由父组件实现 ，index是参数，子组件触发父组件监听的del事件
+	
+	
+	
+ 用key 管理可复用的元素，key值不同的相同元素不会复用 。key值要唯一，尽量不要使用index，一般使用后台传来的id。
+ 
+ 
+ is 》》》》<tr is="todo"></tr> 有些 HTML 元素，诸如 <ul>、<ol>、<table> 和 <select>，对于哪些元素可以出现在其内部是有严格限制的。
+			而有些元素，诸如 <li>、<tr> 和 <option>，只能出现在其它某些特定的元素内部。
+			
+			
+自定义事件、原生事件》》》》》》触发子组件click。。。。。
+
+
+同一节点中，v-for 的优先级比 v-if 更高，这意味着 v-if 将分别重复运行于每个 v-for 循环中
+
+
+
+
+《《生命周期钩子》》
+beforeCreate 双向绑定未完成------------this.consumeTopicArr.push() 报错：Cannot read property 'push' of undefined
+Created  双向绑定已完成----------------this.consumeTopicArr.push() 不会报错
+		在创建vue对象时，当html渲染之前就触发；但是注意，全局vue.js不强制刷新或者重启时只创建一次，也就是说，created()只会触发一次；
+
+beforeMount 页面还没有被渲染---------helloword未显示
+mounted 挂载完成，页面已经被渲染---------显示helloword 可以执行ajax操作
+
+activated()：在vue对象存活的情况下，进入当前存在activated()函数的页面时，一进入页面就触发；可用于初始化页面数据等
+
+deactivated: 包含keep-alive组件的页面隐藏或者被替换成新的页面时执行
+
+
+
+
+
+
+深入响应式原理？
+	当你把一个普通的 JavaScript 对象传给 Vue 实例的 data 选项，Vue 将遍历此对象所有的属性，并使用 Object.defineProperty 把这些属性全部转为 getter/setter。
+	Object.defineProperty 是 ES5 中一个无法 shim 的特性，这也就是为什么 Vue 不支持 IE8 以及更低版本浏览器。
+	每个组件实例都有相应的 watcher 实例对象，它会在组件渲染的过程中把属性记录为依赖，之后当依赖项的 setter 被调用时，会通知 watcher 重新计算，从而致使它关联的组件得以更新。
+	受现代 JavaScript 的限制 (而且 Object.observe 也已经被废弃)，Vue 不能检测到对象属性的添加或删除。由于 Vue 会在初始化实例时对属性执行 getter/setter 转化过程，
+	所以属性必须在 data 对象上存在才能让 Vue 转换它，这样才能让它是响应的。
+	
+	vue中对象属性改变视图不更新问题 解决方法：
+	Vue.set(vm.someObject, 'b', 2)
+	
+	this.$set(this.someObject,'b',2)
+	
+	this.someObject = Object.assign({}, this.someObject, { a: 1, b: 2 })
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+
+
+vue cli  
+	创建项目：vue init webpack projectname
+	
+	
+Git
+	为什么Git比其他版本控制系统设计得优秀，因为Git跟踪并管理的是修改，而非文件。
+	你会问，什么是修改？比如你新增了一行，这就是一个修改，删除了一行，也是一个修改，
+	更改了某些字符，也是一个修改，删了一些又加了一些，也是一个修改，甚至创建一个新文件，也算一个修改。
+	
+	git status	//查看分支 如果git status告诉你有文件被修改过，用git diff可以查看修改内容。
+	git diff // 比较的是工作区文件与暂存区文件的区别（上次git add 的内容） 
+	git diff --cached // 比较的是暂存区的文件与仓库分支里（上次git commit 后的内容）的区别
+
+	git add . 	//提交本地修改至本地git缓存区
+	git commit -m 'init' //提交缓存区内容至本地仓库的当前分支 -m：提示信息
+	// 需要提交的文件修改通通放到暂存区，然后，一次性提交暂存区的所有修改。
+				
+	git push	//上传
+	git pull  //下拉
+	git checkout brachname	// 切换到指定分支
+	git checkout -- file  // 可以丢弃工作区的修改（修改、删除、新增），让这个文件回到最近一次git commit或git add时的状态。(从来没有被添加到版本库就被删除的文件，是无法恢复的！)
+	git merge brachname //合并指定分支到master
+	git log --pretty=oneline //查看提交历史
+	git reflog //查看命令历史
+	git reset --hard commit_id //改变版本
+	git rm //删掉
+	
+	HEAD指向的版本就是当前版本，因此，Git允许我们在版本的历史之间穿梭，使用命令git reset --hard commit_id 或者 git reset --hard HEAD"^"。
+	在Git中，用HEAD表示当前版本，也就是最新的提交1094adb...（注意我的提交ID和你的肯定不一样），
+	上一个版本就是HEAD^，上上一个版本就是HEAD^^，当然往上100个版本写100个^比较容易数不过来，所以写成HEAD~100。
+
+	穿梭前，用git log --pretty=oneline可以查看提交历史，以便确定要回退到哪个版本。
+
+	要重返未来，用git reflog查看命令历史，以便确定要回到未来的哪个版本。
+	
+	
+	删除
+	1.如果你用的rm删除文件，那就相当于只删除了工作区的文件，如果想要恢复，直接用git checkout -- <file>就可以 
+	2.如果你用的是git rm删除文件，那就相当于不仅删除了文件，而且还添加到了暂存区，需要先git reset HEAD <file>，然后再git checkout -- <file> 
+	3.如果你想彻底把版本库的删除掉，先git rm，再git commit 就ok了
+	
+	
+	
+	
+	远程仓库配置
+	git config --global user.name "yourname"
+
+	git config --global user.email“your@email.com"
+	创建SSH key
+	$ ssh-keygen -t rsa -C "youremail@example.com"
+
+	
+	ssh -T git@github.com
+	
+	要关联一个远程库，使用命令git remote add origin git@server-name:path/repo-name.git；
+
+	关联后，使用命令git push -u origin master第一次推送master分支的所有内容；
+
+	此后，每次本地提交后，只要有必要，就可以使用命令git push origin master推送最新修改；
+
+	分布式版本系统的最大好处之一是在本地工作完全不需要考虑远程库的存在，也就是有没有联网都可以正常工作，而SVN在没有联网的时候是拒绝干活的！
+	当有网络的时候，再把本地提交推送一下就完成了同步，真是太方便了！
+	
+	
+	
+	
