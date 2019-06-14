@@ -148,9 +148,13 @@ Git
 				
 	git push	//上传
 	git pull  //下拉
+	git branch // 查看本地分支 - a查看所有分支
+	git branch brachname //创建分支
 	git checkout brachname	// 切换到指定分支
 	git checkout -- file  // 可以丢弃工作区的修改（修改、删除、新增），让这个文件回到最近一次git commit或git add时的状态。(从来没有被添加到版本库就被删除的文件，是无法恢复的！)
-	git merge brachname //合并指定分支到master
+	git checkout -b brachname // 创建+切换分支
+	git merge brachname //合并指定分支到当前分支
+	git branch -d brachname // 删除分支
 	git log --pretty=oneline //查看提交历史
 	git reflog //查看命令历史
 	git reset --hard commit_id //改变版本
