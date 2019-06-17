@@ -28,3 +28,6 @@ ROWNUM》》》
 
 
 sysibm.sysdummy1
+
+
+		    substr(indx_clss_pth,1,length(translate(#{clss_pth})))=#{clss_pth}
