@@ -1,0 +1,143 @@
+	
+Git
+	为什么Git比其他版本控制系统设计得优秀，因为Git跟踪并管理的是修改，而非文件。
+	你会问，什么是修改？比如你新增了一行，这就是一个修改，删除了一行，也是一个修改，
+	更改了某些字符，也是一个修改，删了一些又加了一些，也是一个修改，甚至创建一个新文件，也算一个修改。
+	
+	git status	//查看分支 如果git status告诉你有文件被修改过，用git diff可以查看修改内容。
+	git diff // 比较的是工作区文件与暂存区文件的区别（上次git add 的内容） 
+	git diff --cached // 比较的是暂存区的文件与仓库分支里（上次git commit 后的内容）的区别
+
+	git add . 	//提交本地修改至本地git缓存区
+	git commit -m 'init' //提交缓存区内容至本地仓库的当前分支 -m：提示信息
+	// 需要提交的文件修改通通放到暂存区，然后，一次性提交暂存区的所有修改。
+				
+	git push	//上传
+	git pull  //下拉
+	git branch // 查看本地分支 - a查看所有分支
+	git branch brachname //创建分支
+	git checkout brachname	/// 切换到指定分支
+	git checkout -- file  // 可以丢弃工作区的修改（修改、删除、新增），让这个文件回到最近一次git commit或git add时的状态。(从来没有被添加到版本库就被删除的文件，是无法恢复的！)
+	git checkout -b brachname // 创建+切换分支
+	git merge brachname //合并指定分支到当前分支
+	git branch -d brachname // 删除分支 如果要丢弃一个没有被合并过的分支，可以通过git branch -D <name>强行删除。
+	git push origin --delete <BranchName> // 删除远程分支
+	git log --pretty=oneline //查看提交历史
+	git reflog //查看命令历史
+	git reset --hard commit_id //改变版本
+	git rm //删掉
+	git stash //把当前工作现场“储藏”起来，等以后恢复现场后继续工作
+	git push origin master --force
+	
+	git reflog
+	git reset --soft HEAD^ 撤销上次commit
+	git reset --soft HEAD~1 撤销上次commit
+
+
+1) 切换到基础分支，如主干
+
+git checkout master
+
+2）创建并切换到新分支
+
+git checkout -b panda
+
+git branch可以看到已经在panda分支上
+
+3)更新分支代码并提交
+
+git add *
+
+git commit -m "init panda"
+
+git push origin panda
+
+
+	HEAD指向的版本就是当前版本，因此，Git允许我们在版本的历史之间穿梭，
+	使用命令git reset --hard commit_id 或者 git reset --hard HEAD"^"。
+	在Git中，用HEAD表示当前版本，也就是最新的提交1094adb...（注意我的提交ID和你的肯定不一样），
+	上一个版本就是HEAD^，上上一个版本就是HEAD^^，当然往上100个版本写100个^比较容易数不过来，所以写成HEAD~100。
+
+	穿梭前，用git log --pretty=oneline可以查看提交历史，以便确定要回退到哪个版本。
+
+	要重返未来，用git reflog查看命令历史，以便确定要回到未来的哪个版本。
+	
+	
+	删除
+		1.如果你用的rm删除文件，那就相当于只删除了工作区的文件，如果想要恢复，直接用git checkout -- <file>就可以 
+		2.如果你用的是git rm删除文件，那就相当于不仅删除了文件，而且还添加到了暂存区，需要先git reset HEAD <file>，然后再git checkout -- <file> 
+		3.如果你想彻底把版本库的删除掉，先git rm，再git commit 就ok了
+	
+	修复bug
+		修复bug时，我们会通过创建新的bug分支进行修复，然后合并，最后删除；
+		当手头工作没有完成时，先把工作现场git stash一下，然后去修复bug，修复后，再git stash pop，回到工作现场。
+
+
+	多人协作的工作模式通常是这样：
+		首先，可以试图用git push origin <branch-name>推送自己的修改；
+		如果推送失败，则因为远程分支比你的本地更新，需要先用git pull试图合并；
+		如果合并有冲突，则解决冲突，并在本地提交；
+		没有冲突或者解决掉冲突后，再用git push origin <branch-name>推送就能成功！
+		如果git pull提示no tracking information，则说明本地分支和远程分支的链接关系没有创建，
+		用命令git branch --set-upstream-to <branch-name> origin/<branch-name>。
+		这就是多人协作的工作模式，一旦熟悉了，就非常简单。
+	
+	哪些分支需要推送，哪些不需要呢？
+		master分支是主分支，因此要时刻与远程同步；
+		dev分支是开发分支，团队所有成员都需要在上面工作，所以也需要与远程同步；
+		bug分支只用于在本地修复bug，就没必要推到远程了，除非老板要看看你每周到底修复了几个bug；
+		feature分支是否推到远程，取决于你是否和你的小伙伴合作在上面开发。
+		总之，就是在Git中，分支完全可以在本地自己藏着玩，是否推送，视你的心情而定！
+		
+	远程仓库配置
+		git config --global user.name "yourname"
+		git config --global user.email“your@email.com"
+	创建SSH key
+		$ ssh-keygen -t rsa -C "youremail@example.com"
+
+	
+		ssh -T git@github.com
+	
+		Git本地新项目推送到远程仓库	
+		https://www.cnblogs.com/keenajiao/p/16440063.html
+		create a new repository on the command line
+			echo "# learn" >> README.md
+			git init
+			git add README.md
+			git commit -m "first commit"
+			git remote add origin https://github.com/ElanYhy/learn.git
+			git push -u origin master
+			或者
+			git push -u origin master -f
+
+			
+	push an existing repository from the command line
+		要关联一个远程库，使用命令git remote add origin git@server-name:path/repo-name.git；
+
+		关联后，使用命令git push -u origin master第一次推送master分支的所有内容；
+
+		此后，每次本地提交后，只要有必要，就可以使用命令git push origin master推送最新修改；
+
+		分布式版本系统的最大好处之一是在本地工作完全不需要考虑远程库的存在，也就是有没有联网都可以正常工作，而SVN在没有联网的时候是拒绝干活的！
+		当有网络的时候，再把本地提交推送一下就完成了同步，真是太方便了！
+	
+	
+	
+	常用git stash命令：
+
+	（1）git stash save "save message"  : 执行存储时，添加备注，方便查找，只有git stash 也要可以的，但查找时不方便识别。
+
+	（2）git stash list  ：查看stash了哪些存储
+
+	（3）git stash show ：显示做了哪些改动，默认show第一个存储,如果要显示其他存贮，后面加stash@{$num}，比如第二个 git stash show stash@{1}
+
+	（4）git stash show -p : 显示第一个存储的改动，如果想显示其他存存储，命令：git stash show  stash@{$num}  -p ，比如第二个：git stash show  stash@{1}  -p
+
+	（5）git stash apply :应用某个存储,但不会把存储从存储列表中删除，默认使用第一个存储,即stash@{0}，如果要使用其他个，git stash apply stash@{$num} ， 比如第二个：git stash apply stash@{1} 
+
+	（6）git stash pop ：命令恢复之前缓存的工作目录，将缓存堆栈中的对应stash删除，并将对应修改应用到当前的工作目录下,默认为第一个stash,即stash@{0}，如果要应用并删除其他stash，命令：git stash pop stash@{$num} ，比如应用并删除第二个：git stash pop stash@{1}
+
+	（7）git stash drop stash@{$num} ：丢弃stash@{$num}存储，从列表中删除这个存储
+
+	（8）git stash clear ：删除所有缓存的stash
+	

@@ -1,0 +1,76 @@
+package com.ytec.edq.web;
+
+import org.springframework.aop.framework.AopContext;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * @ Author     ：xuefeng
+ * @ Date       ：2019/2/20 11:32 AM
+ *
+ *
+ * Spring事物
+ * Required：如果当前存在事物则使用该事物，否则将新建一个事物
+ *
+ * Requires_new：如果当前存在事物，则挂起当前事物并且开启一个新事物继续执行，
+ * 新事物执行完毕之后，然后在唤醒之前挂起的事物，如果当前不存在事物的话，开启一个新事物
+ *
+ * Spring事物：jdk动态代理，CGLIB    Aop是基于jdk动态代理
+ *
+ *
+ * springaop 事物不生效 解决办法
+ *  *
+ *
+ */
+
+public class test {
+
+
+
+
+    /**
+     * 父事物
+     * 需求：
+     * 1。parent必须调用child
+     * 2。child方法不是那么重要，也就是child成功不成功对Parent的执行是没有影响的
+     *
+     * 预期的效果
+     * 1。child 回滚
+     * 2。parent插入成功
+     *
+     * 真实效果
+     */
+    @Transactional
+    public static void main(String[] args)  {
+        try {
+
+            //必须要获取到当前AopPeoxy
+            //然后通过Aop代理来调用child方法
+            //通过ApplicationContext 也可以解决这个问题
+            //AopContext.currentProxy()这个是通过aop的上下文获取当前的Proxy（就是获取aop当前的代理） 这样调的话是用到了jdk代理对象 this的话是当前目标对象 这里得
+            //开启aspecyj 暴露AOP代理到ThreadLocal
+            //<aop:aspectj-autoproxy expose-proxy="true"/> 这里默认是false 要改为true
+            ((test)AopContext.currentProxy()).child();
+            System.out.println("ahah");
+            //this 是当前目标对象，而不是代理对象，，所有如果使用this或者直接调方法事物是不生效的 （事物是开启了 但是是不生效的 因为他）
+            //this.child();
+        } catch (Exception e) {
+            System.out.println("异常:"+e);
+        }
+//
+    }
+
+
+    /**
+     * 子事物
+     */
+    @Transactional(propagation = Propagation.REQUIRES_NEW) //这个事务的意思是如果前面方法有事务存在，会将前面事务挂起，再重启一个新事务
+    public static void child() {
+
+        int a = 1 / 0;//抛出运行时异常
+        //throw new RUntimeException();
+    }
+
+
+}
+

@@ -1,0 +1,63 @@
+ROWNUM》》》
+	row_number() over()
+	fetch first (${pageCount}+${offset}) rows only
+	
+	， 》》》 ,
+	
+	order by 和 fetch first 连用》》》
+		order by在前fetch first在后
+		
+	NUMTODSINTERVAL(-8,'HOUR') 》》》
+		- 8 hour
+		
+	查询count时去掉多余的order by
+	
+	integer 》》》
+		bigint
+		
+		
+		内置表 
+			all_tables 》》 syscat.tables
+			all_tab_cols  》》 syscat.COLUMNS
+		
+	<!--(curr_st_time -TO_DATE('19700101','yyyy-mm-dd hh24:mi:ss'))*86400 - TO_NUMBER(SUBSTR(TZ_OFFSET(sessiontimezone),1,3))*3600 "startTime",
+        (curr_end_time -TO_DATE('19700101','yyyy-mm-dd hh24:mi:ss'))*86400 - TO_NUMBER(SUBSTR(TZ_OFFSET(sessiontimezone),1,3))*3600 "endTime"-->
+        》》》
+		TO_NUMBER(TIMESTAMPDIFF(2,CHAR(curr_st_time - TIMESTAMP('1970-01-01') ))) -8*3600 +12*24*3600 "startTime",
+        TO_NUMBER(TIMESTAMPDIFF(2,CHAR(curr_end_time - TIMESTAMP('1970-01-01') ))) -8*3600 +12*24*3600 "endTime"
+
+select * from sysibm.sysdummy1
+
+		    substr(indx_clss_pth,1,length(translate(#{clss_pth})))=#{clss_pth}
+
+
+
+
+DB2 执行SQL报错： DB2 SQL Error: SQLCODE=-1585, SQLSTATE=54048
+你建的db2数据库没有建足够大的临时表空间，新建一个足够大的临时表空间
+
+	CREATE BUFFERPOOL buf32 IMMEDIATE  SIZE 250 NUMBLOCKPAGES 108 BLOCKSIZE 32 PAGESIZE 32K;
+
+	CREATE SYSTEM TEMPORARY TABLESPACE pds_temp pagesize 32k bufferpool buf32;
+	
+	
+	grant select,update,insert,delete on APDSP.LCP_BI_PREVLIST to user db2inst3;
+	
+	CALL SYSPROC.ADMIN_CMD('reorg table DQCDB.DQ_RESULT_MAPPING')
+	
+	
+	
+
+
+
+db2查看执行计划相关信息。
+	首先创建explain表：
+	$ db2 -tvf $HOME/sqllib/misc/EXPLAIN.DDL
+
+	然后在你想查看的SQL语句前面加上explain plan for
+
+	例如：explain plan for select * for test
+
+	此时并不会想MySQL一样直接显示相关信息。执行计划相关信息在EXPLAIN_STATEMENT中
+
+	执行SQL语句 select * for EXPLAIN_STATEMENT 就可以查看执行计划相关信息

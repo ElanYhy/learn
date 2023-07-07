@@ -1,0 +1,1262 @@
+服务端高并发分布式架构演进之路：https://segmentfault.com/a/1190000018626163
+	分布式
+		系统中的多个模块在不同服务器上部署，即可称为分布式系统，如Tomcat和数据库分别部署在不同的服务器上，或两个相同功能的Tomcat分别部署在不同服务器上
+	高可用
+		系统中部分节点失效时，其他节点能够接替它继续提供服务，则可认为系统具有高可用性
+	集群
+		一个特定领域的软件部署在多台服务器上并作为一个整体提供一类服务，这个整体称为集群。如Zookeeper中的Master和Slave分别部署在多台服务器上，共同组成一个整体提供集中配置服务。在常见的集群中，客户端往往能够连接任意一个节点获得服务，并且当集群中一个节点掉线时，其他节点往往能够自动的接替它继续提供服务，这时候说明集群具有高可用性
+	负载均衡
+		请求发送到系统时，通过某些方式把请求均匀分发到多个节点上，使系统中每个节点能够均匀的处理请求负载，则可认为系统是负载均衡的
+	正向代理和反向代理
+		系统内部要访问外部网络时，统一通过一个代理服务器把请求转发出去，在外部网络看来就是代理服务器发起的访问，此时代理服务器实现的是正向代理；
+		当外部请求进入系统时，代理服务器把该请求转发到系统中的某台服务器上，对外部请求来说，与之交互的只有代理服务器，此时代理服务器实现的是反向代理。简单来说，正向代理是代理服务器代替系统内部来访问外部网络的过程，反向代理是外部请求访问系统时通过代理服务器转发到内部服务器的过程。
+	微服务	
+		如用户管理、订单、支付、鉴权等功能在多个应用中都存在，那么可以把这些功能的代码单独抽取出来形成一个单独的服务来管理，这样的服务就是所谓的微服务，应用和服务之间通过HTTP、TCP或RPC请求等多种方式来访问公共服务，每个单独的服务都可以由单独的团队来管理。
+		此外，可以通过Dubbo、SpringCloud等框架实现服务治理、限流、熔断、降级等功能，提高服务的稳定性和可用性。	
+	云平台
+		所谓的云平台，就是把海量机器资源，通过统一的资源管理，抽象为一个资源整体，在之上可按需动态申请硬件资源（如CPU、内存、网络等），并且之上提供通用的操作系统，提供常用的技术组件（如Hadoop技术栈，MPP数据库等）供用户使用，甚至提供开发好的应用，
+		用户不需要关系应用内部使用了什么技术，就能够解决需求（如音视频转码服务、邮件服务、个人博客等）。	
+		
+	
+Spring MVC的客户端与服务端的交互流程
+	起始于DispatcherServlet，
+	DispatcherServlet为前端控制器，负责分发视图层的请求，配置在web.xml文件中。
+	DispatcherServlet依据相应的规则将客户端请求分发到目标Controller（控制层）来处理，
+	Controller调用Service（业务层）处理业务，Service调用DAO（数据持久层）访问数据库，并完成数据库的增删改查操作，
+	DAO层返沪处理结果给Service层，Service层再返回结果给Controller层，最后Controller层返回具体页面和数据到客户端。
+		
+拦截器（Interceptor）
+	https://www.cnblogs.com/junzi2099/p/8022058.html
+	interceptor 的执行顺序大致为：
+
+	请求到达 DispatcherServlet
+	DispatcherServlet 发送至 Interceptor ，执行 preHandle
+	请求达到 Controller
+	请求结束后，postHandle 执行
+	Spring 中主要通过 HandlerInterceptor 接口来实现请求的拦截，实现 HandlerInterceptor 接口需要实现下面三个方法：
+	preHandle() – 在handler执行之前，返回 boolean 值，true 表示继续执行，false 为停止执行并返回。
+	postHandle() – 在handler执行之后, 可以在返回之前对返回的结果进行修改
+	afterCompletion() – 在请求完全结束后调用，可以用来统计请求耗时等等
+
+ps -ef | grep 进程名
+lsof -i :8888
+kill -9 3231
+nohup java -jar a.jar > log.log&
+
+
+netstat -aon|findstr "8000"
+tasklist|findstr "9088"
+taskkill /T /F /PID 9088 
+
+
+Jackson
+	ObjectMapper类是Jackson库的主要类。它提供一些功能将转换成Java对象匹配JSON结构，反之亦然。它使用JsonParser和JsonGenerator的实例实现JSON实际的读/写。
+
+JdbcTemplate
+	JdbcTemplate是Spring对JDBC的封装，目的是使JDBC更加易于使用。JdbcTemplate是Spring的一部分。JdbcTemplate处理了资源的建立和释放。他帮助我们避免一些常见的错误，比如忘了总要关闭连接。他运行核心的JDBC工作流，如Statement的建立和执行，而我们只需要提供SQL语句和提取结果。
+
+
+SpringBoot crudrespository
+
+
+QueryDSL
+	https://www.jianshu.com/p/69dcb1b85bbb
+
+	
+MessageDigest
+
+byte转int &0xff
+	https://www.cnblogs.com/think-in-java/p/5527389.html
+	为什么byte类型的数字要&0xff再赋值给int类型，其本质原因就是想保持二进制补码的一致性
+	计算机内的存储都是利用二进制的补码进行存储的
+	对于正数（00000001）原码来说，首位表示符号位，反码 补码都是本身
+	对于负数（100000001）原码来说，反码是对原码除了符号位之外作取反运算即（111111110），补码是对反码作+1运算即（111111111）
+	
+	byte[] bs = digest.digest(origin.getBytes(Charset.forName(charsetName))) ;  
+          
+	for (int i = 0; i < bs.length; i++) {  
+		int c = bs[i] & 0xFF ;
+		if(c < 16){ 
+			sb.append("0");  
+		}  
+		sb.append(Integer.toHexString(c)) ;  
+	}  
+	return sb.toString() ;
+
+maven	
+	mvn clean package依次执行了clean、resources、compile、testResources、testCompile、test、jar(打包)等７个阶段。
+	mvn clean install依次执行了clean、resources、compile、testResources、testCompile、test、jar(打包)、install等8个阶段。
+	mvn clean deploy依次执行了clean、resources、compile、testResources、testCompile、test、jar(打包)、install、deploy等９个阶段。
+	
+	package命令完成了项目编译、单元测试、打包功能，但没有把打好的可执行jar包（war包或其它形式的包）布署到本地maven仓库和远程maven私服仓库
+	install命令完成了项目编译、单元测试、打包功能，同时把打好的可执行jar包（war包或其它形式的包）布署到本地maven仓库，但没有布署到远程maven私服仓库
+	deploy命令完成了项目编译、单元测试、打包功能，同时把打好的可执行jar包（war包或其它形式的包）布署到本地maven仓库和远程maven私服仓库
+
+	————————————————
+	原文链接：https://blog.csdn.net/qq_41615095/article/details/113628290
+	
+	mvn 
+		install:install-file -Dfile=E:\job\fa-men\eladmin\eladmin-system\target\eladmin-system-2.6.jar -DgroupId=me.zhengjie -DartifactId=eladmin-system -Dversion=2.6 -Dpackaging=jar
+
+	dependencyManagement
+		依赖版本配置
+		<dependencyManagement>
+			<dependencies>
+				<dependency>
+					<groupId>org.springframework.cloud</groupId>
+					<artifactId>spring-cloud-dependencies</artifactId>
+					<version>${spring-cloud.version}</version>
+					<type>pom</type>
+					<scope>import</scope>
+				</dependency>
+			</dependencies>
+		</dependencyManagement>
+		
+	packaging
+		1.pom工程：用在父级工程或聚合工程中。用来做jar包的版本控制。
+		2.war工程：将会打包成war，发布在服务器上的工程。如网站或服务。
+		3.jar工程：将会打包成jar用作jar包使用。
+	
+	
+----------------------------------------------------------------------------------	
+quartz
+	https://blog.csdn.net/noaman_wgs/article/details/80984873
+	
+
+@RestControllerAdvice
+	1、使用@RestControllerAdvice注解 + RequestBodyAdvice + ResponseBodyAdvice接口，
+		可以对请求的输入输出进行处理（参数解密/返回结果加密，打印请求参数和返回结果的日志等），避免了在controller中对业务代码侵入。	
+		RequestBodyAdvice 
+			针对所有以@RequestBody的参数，在读取请求body之前或者在body转换成对象之前可以做相应的增强。
+			我们处理了有参数和没有参数的情况，打印出请求类、方法、请求参数。
+			注意：这里要加上@ControllerAdvice请求才能增强。
+		ResponseBodyAdvice
+			controller层返回会先被此类拦截，然后返回。
+			拦截时先执行supports方法，判断返回值为true时，才会执行beforeBodyWrite方法，将返回值包装为BaseResponse类型；
+			返回值为false时，则不会执行beforeBodyWrite方法。
+	2、使用@RestControllerAdvice注解 + @ExceptionHandler(NoHandlerFoundException.class)注解
+		可以对异常进行全局处理
+		404异常 NoHandlerFoundException：需要@EnableWebMvc，以及spring.mvc.throw-exception-if-no-handler-found: true
+
+	
+WebSecurityConfigurerAdapter
+	@EnableWebSecurity
+
+抽象类/抽象工厂模式注入失败：@EnableAutoConfiguration自动装配
+	@Resource
+    private Map<String, BaseFormula> formulaMap;
+	IncompresibleFluid incom = (IncompresibleFluid) formulaMap.get("incompresibleFluid");
+	
+@PropertySource(value = {"demo/props/demo.properties"})
+@ConfigurationProperties(prefix = "demo")
+组合使用，可以将属性文件与一个Java类绑定，将属性文件中的变量值注入到该Java类的成员变量中	
+
+reflect
+	Java程序在运行状态可以动态的获取类的所有属性和方法，并实例化该类，调用方法的功能 
+	Class cls = Class.forName("apple");
+	Field field = cls.getDeclaredField(member);
+	field.setAccessible(true);  //强制授权
+	field.get(obj);
+
+
+	/**
+     * @Description: 得到对象中的指定的属性内容
+     * @param obj   可以为map或者实体类（如为实体类，需给出getter）
+     * @param member    key值或方法名（方法名需加()作为标识）
+     * @return: {@link Object}
+     */
+    private static Object getAttribute(Object obj, String member) {
+        if (obj == null) {
+            return null;
+        }
+        boolean isMethod = member.endsWith("()");
+        if (!isMethod && obj instanceof Map) {
+            //如果不是方法，则取map中的键值对
+            return ((Map) obj).get(member);
+        }
+        try {
+            Class<?> cls = obj.getClass();
+            if (isMethod) {
+                //如果是方法，则进行反射
+                Method method = cls.getDeclaredMethod(member.substring(0, member.length() - 2));
+                return method.invoke(obj);
+            } else {
+                //获得某个类的所有声明的字段，即包括public、private和protected
+                Field field = cls.getDeclaredField(member);
+                field.setAccessible(true);  //强制授权
+                return field.get(obj);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            LOGGER.error(BASE_LOGGER + "getAttribute异常{}", e);
+            return null;
+        }
+    }
+向上转型、向下转型
+	向上转型：用父类的引用变量去引用子类的实例
+	class Animal {
+	
+	}
+	class Dog extend Animal {
+	
+	}
+	
+	Animal a = new Dog(); // 向上转型
+	Dog d = (Dog)a; // 向下转型
+	
+java.util.concurrent.locks.Condition
+	
+/**
+ * 虚假唤醒
+ *
+ * 锁池:假设线程A已经拥有了某个对象(注意:不是类)的锁，而其它的线程想要调用这个对象的某个synchronized方法(或者synchronized块)，
+ *      由于这些线程在进入对象的synchronized方法之前必须先获得该对象的锁的拥有权，
+ *      但是该对象的锁目前正被线程A拥有，所以这些线程就进入了该对象的锁池中。
+ * 等待池:假设一个线程A调用了某个对象的wait()方法，线程A就会释放该对象的锁后，进入到了该对象的等待池中
+ *
+ * 如果线程调用了对象的 wait()方法，那么线程便会处于该对象的等待池中，等待池中的线程不会去竞争该对象的锁。
+ *  * 当有线程调用了对象的 notifyAll()方法（唤醒所有 wait 线程）或 notify()方法（只随机唤醒一个 wait 线程），
+ *  * 被唤醒的的线程便会进入该对象的锁池中，锁池中的线程会去竞争该对象锁
+ *  *
+ *
+ *  1. 你可以使用wait和notify函数来实现线程间通信。你可以用它们来实现多线程（>3）之间的通信。
+ *
+ * 2. 永远在synchronized的函数或对象里使用wait、notify和notifyAll，不然Java虚拟机会生成 IllegalMonitorStateException。
+ *
+ * 3. 永远在while循环里而不是if语句下使用wait。这样，循环会在线程睡眠前后都检查wait的条件，并在条件实际上并未改变的情况下处理唤醒通知。
+ *
+ * 4. 永远在多线程间共享的对象（在生产者消费者模型里即缓冲区队列）上使用wait。
+ *
+ * 5. 基于前文提及的理由，更倾向用 notifyAll()，而不是 notify()。
+ *
+ * 原文链接：https://blog.csdn.net/djzhao/article/details/79410229
+ */
+Thread.yield()
+		向调度程序暗示（hint）当前线程愿意让出CPU，调度程序可以忽略此暗示。
+		也就是说当前线程可能根本就没有让出CPU，线程一直在运行
+	
+是否可以从static方法内对非static方法调用？为什么？
+        不可以。因为非static方法是与对象关联的，必须创建一个对象，才可以在该对象上进行方法调用（对象.方法）。
+		而static方法调用时不需要创建对象，可以直接调用。如果从一个static方法中发出对非static方法的调用，
+		那个非static方法是关联到哪个对象上的呢？这个逻辑无法成立。
+		
+静态方法如果没有使用静态变量（类变量），则没有线程安全问题。
+
+	局部变量，每个线程调用时，都会新创建一份，而不会共用一个存储单元。
+	比如这里的tmp,每个线程都会创建自己的一份，因此不会有线程安全问题
+
+	静态变量，由于是在类加载时占用一个存储区，每个线程都是共用这个存储区的，
+	所以如果在静态方法里使用了静态变量，这就会有线程安全问题！
+	
+	实例变量，单例模式或只对一个对象进行操作时线程不安全
+	
+静态方法调用注入的类
+	private static BaoheSteamFeatureService baoheSteamFeatureService;
+
+	@Resource
+	private void setBaoheSteamFeatureService(BaoheSteamFeatureService baoheSteamFeatureService) {
+		ValueUnit.baoheSteamFeatureService = baoheSteamFeatureService;
+	}
+	
+@PostConstruct
+
+泛型
+	原文链接：https://blog.csdn.net/s10461/article/details/53941091
+	
+	泛型的本质是参数化类型，也就是说所操作的数据类型被指定为一个参数，
+	泛型的好处是在编译的时候检查类型安全，并且所有的强制转换都是自动和隐式的，以提高代码的重用率 
+	
+	在非泛型编程中，将筒单类型作为Object传递时会引起Boxing（装箱）和Unboxing（拆箱）操作
+	
+	泛型类，是在实例化类的时候指明泛型的具体类型；
+	
+	泛型方法，是在调用方法的时候指明泛型的具体类型 。
+		1）public 与 返回值中间<T>非常重要，可以理解为声明此方法为泛型方法。
+		2）只有声明了<T>的方法才是泛型方法，泛型类中的使用了泛型的成员方法并不是泛型方法。
+		3）<T>表明该方法将使用泛型类型T，此时才可以在方法中使用泛型类型T。
+		4）与泛型类的定义一样，此处T可以随便写为任意标识，常见的如T、E、K、V等形式的参数常用于表示泛型。
+		public <T> T genericMethod(Class<T> tClass)throws InstantiationException ,
+		  IllegalAccessException{
+				T instance = tClass.newInstance();
+				return instance;
+		}
+	在泛型类中声明了一个泛型方法，使用泛型T，注意这个T是一种全新的类型，可以与泛型类中声明的T不是同一种类型。
+
+	泛型通配符?是一种类型实参，可以看做为Number等所有类的父类
+		public void showKeyValue1(Generic<?> obj){
+			Log.d("泛型测试","key value is " + obj.getKey());
+		}
+		
+		
+装箱和拆箱的实现过程：
+	https://www.cnblogs.com/dolphin0520/p/3780005.html
+　　装箱过程是通过调用包装器的valueOf方法实现的，而拆箱过程是通过调用包装器的 xxxValue方法实现的。（xxx代表对应的基本数据类型）。
+	
+	int（4字节）	Integer
+	byte（1字节）	Byte
+	short（2字节）	Short
+	long（8字节）	Long
+	float（4字节）	Float
+	double（8字节）	Double
+	char（2字节）	Character
+	boolean（未定）	Boolean
+
+	Integer a = 1;
+	int i = a.intValue();
+	Integer.valueOf(i);
+
+谈谈Integer i = new Integer(xxx)和Integer i =xxx;这两种方式的区别。
+
+　　当然，这个题目属于比较宽泛类型的。但是要点一定要答上，我总结一下主要有以下这两点区别：
+
+　　1）第一种方式不会触发自动装箱的过程；而第二种方式会触发；
+
+　　2）在执行效率和资源占用上的区别。第二种方式的执行效率和资源占用在一般性情况下要优于第一种情况（注意这并不是绝对的）。
+
+3L.equals((Integer)1 + (Integer)2) false
+3L.equals((Integer)1 + 2L) true
+(Integer)3 == ((Integer)1 + (Integer)2) true 自动拆箱
+当 "=="运算符的两个操作数都是 包装器类型的引用，则是比较指向的是否是同一个对象，
+而如果其中有一个操作数是表达式（即包含算术运算）则比较的是数值（即会触发自动拆箱的过程）。
+另外，对于包装器类型，equals方法并不会进行类型转换
+
+类型转换：
+	自动转换：byte-->short-->int-->long-->float-->double
+	强制转换：①会损失精度，产生误差，小数点以后的数字全部舍弃。②容易超过取值范围。
+	short a = 1;
+	a = (short) (a + 1);
+	a += 1;
+	
+	
+Eureka
+	Client端：
+		@EnableDiscoveryClient和@EnableEurekaClient 共同点就是：都是能够让注册中心能够发现，扫描到改服务。
+		不同点：@EnableEurekaClient只适用于Eureka作为注册中心，@EnableDiscoveryClient 可以是其他注册中心。
+		
+		spring:
+		  application:
+			name: microservice-provider-user
+		eureka:
+		  client:
+			serviceUrl:
+			  defaultZone: http://localhost:8761/eureka/
+
+	Server端：
+		@EnableEurekaServer
+		
+		eureka:
+		  instance:
+			hostname: localhost
+		  client:
+			registerWithEureka: false
+			fetchRegistry: false
+			serviceUrl:
+			  defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka/
+		spring:
+		  application:
+			name: eureka-server01
+
+负载均衡
+	https://blog.csdn.net/qq_45783660/article/details/112672136
+	集中式LB
+	即在服务的提供方和消费方之间使用独立的LB设施，如Nginx(反向代理服务器)，由该设施负责把访问请求通过某种策略转发至服务的提供方！
+	进程式 LB
+	将LB逻辑集成到消费方，消费方从服务注册中心获知有哪些地址可用，然后自己再从这些地址中选出一个合适的服务器。
+	Ribbon 就属于进程内LB，它只是一个类库，集成于消费方进程，消费方通过它来获取到服务提供方的地址！
+	
+	实现：
+		RestTemplate+Ribbon 模式下，使用@LoadBalanced注解表明这个restRemplate开启负载均衡的功能
+		Feign集成了Ribbon，默认开启负载均衡
+Hystrix
+	https://blog.csdn.net/forezp/article/details/81040990
+	在微服务架构中，根据业务来拆分成一个个的服务，服务与服务之间可以相互调用（RPC），
+	在Spring Cloud可以用RestTemplate+Ribbon和Feign来调用。为了保证其高可用，单个服务通常会集群部署。
+	由于网络原因或者自身的原因，服务并不能保证100%可用，如果单个服务出现问题，调用这个服务就会出现线程阻塞，
+	此时若有大量的请求涌入，Servlet容器的线程资源会被消耗完毕，导致服务瘫痪。
+	服务与服务之间的依赖性，故障会传播，会对整个微服务系统造成灾难性的严重后果，这就是服务故障的“雪崩”效应。
+	
+	Ribbon中实现：
+		@EnableHystrix 开启熔断器，对需要熔断处理的方法加注解 @HystrixCommand(fallbackMethod = "errorSayHi"))
+		
+	异常处理：Throwable
+		    public String errorSayHi(Throwable throwable) {
+				logger.error("##errorSayHi: {}", throwable.getMessage());
+				return "ribbon - errorSayHi";
+			}
+	#超时时间    
+	hystrix:
+	  command.default.execution.isolation.thread.timeoutInMilliseconds: 5000
+  
+Feign
+	https://blog.csdn.net/forezp/article/details/73480304
+	Feign是一个声明式的伪Http客户端
+	Feign的源码实现的过程如下：
+
+	首先通过 @EnableFeignClients 注解开启FeignClient
+	根据Feign的规则实现接口，并加 @FeignClient 注解
+	程序启动后，会进行包扫描，扫描所有的 @FeignClient 的注解的类，并将这些信息注入到ioc容器中。
+	当接口的方法被调用，通过jdk的代理，来生成具体的RequesTemplate
+	RequesTemplate在生成Request
+	Request交给Client去处理，其中Client可以是HttpUrlConnection、HttpClient也可以是Okhttp
+	最后Client被封装到LoadBalanceClient类，这个类结合类Ribbon做到了负载均衡。
+
+	
+	@FeignClient(value = "serverName")
+	public interface FeignUtil {
+
+		@RequestMapping(value = "/api/consumerHi", method = RequestMethod.GET)
+		String sayHi();
+	}
+	
+	#开启断路器 FeignAutoConfiguration cloud 2020.0.1版本
+	#feign:
+	#  hystrix:
+	#    enabled: true
+	feign:
+	  circuitbreaker:
+		enabled: true
+
+
+
+RestTemplate
+	服务名调用必须加ribbon的@LoadBalanced
+	
+	@Bean
+    @LoadBalanced
+    public RestTemplate restTemplate() {
+//        HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
+        SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+        factory.setConnectTimeout(15000);
+        factory.setReadTimeout(15000);
+//        factory.setConnectionRequestTimeout(5000);
+        return new RestTemplate(factory);
+    }
+
+
+Spring Cloud 2020.0.0版本彻底删除掉了Netflix除Eureka外的所有组件。spring-cloud-starter-openfeign
+	Netflix							推荐替代品			说明
+	Hystrix							Resilience4j	Hystrix自己也推荐你使用它代替自己
+	Hystrix Dashboard / Turbine		Micrometer + Monitoring System	说白了，监控这件事交给更专业的组件去做
+	Ribbon							Spring Cloud Loadbalancer	忍不住了，Spring终究亲自出手
+	Zuul 1							Spring Cloud Gateway	忍不住了，Spring终究亲自出手
+	Archaius 1						Spring Boot外部化配置 + Spring Cloud配置	比Netflix实现的更好、更强大
+	————————————————
+	原文链接：https://blog.csdn.net/u013277209/article/details/111610862
+	
+spring-cloud-gateway
+	spring:
+	  application:
+		name: gateway
+	  cloud:
+		nacos:
+		  server-addr: localhost:8848
+		  discovery:
+			namespace: 333
+			cluster-name: T1
+		gateway:
+		  routes:
+			- id: customer01 # 路由id，自定义，唯一
+			  uri: lb://consumer01 # 目标地址，http：固定地址 lb：负载均衡地址
+			  predicates: # 断言，判断路由是否符合规则，符合则路由到对应uri
+				- Path=/api/**
+				- After=2017-01-20T17:42:47.789-07:00[America/Denver]
+			  filters: # 路由过滤器,针对当前路由id
+				- AddRequestHeader=color, yellow # 添加请求头color
+		  default-filters: # 默认过滤器，针对所有路由id
+			- AddRequestHeader=color, blue
+		  # 同一优先级时，过滤器执行顺序：default-filters -》 路由过滤器
+		  # GlobalFilter与其他2类过滤器相比，永远是最后执行的；它的优先级只对其他全局过滤器起作用
+		  # 所以color: blue,yellow
+		  globalcors: # 全局跨域请求配置
+			cors-configurations:
+			  '[/**]':
+				allowedOrigins: # 允许跨域的网站
+				  - "https://docs.spring.io"
+				allowedMethods: # 允许跨域的请求方法
+				  - GET
+				allowedHeaders: # 跨域时允许携带的请求头
+				  - "*"
+				allowCredentials: true # 是否允许携带cookies
+	
+	/**
+     * 全局过滤器
+    */
+	public class AuthFilter implements GlobalFilter, Ordered {
+        @Override
+        public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+            logger.info("AuthFilter------------");
+            ServerHttpRequest request = exchange.getRequest();
+            MultiValueMap<String, String> queryParams = request.getQueryParams();
+            queryParams.forEach((k, v) -> {
+                logger.info("queryParams--k: " + k + "  v: " + v);
+            });
+            // 请求头添加数据
+            ServerHttpRequest buildRequest = request.mutate()
+                    .header("color", "black")
+                    .header("eee", "eeee").build();
+
+            HttpHeaders headers = request.getHeaders();
+            headers.forEach((k, v) -> {
+                logger.info("headers--k: " + k + "  v: " + v);
+            });
+			
+			String money = request.getQueryParams().getFirst("money");
+            if (StringUtils.isNotEmpty(money)
+                    && NumberUtils.isNumber(money)
+                    && Integer.parseInt(money) > 1) {
+                logger.info("MoneyFilter------------HasMoney: {}", money);
+            } else {
+                logger.info("MoneyFilter------------NoMoney: {}", money);
+				// 拦截返回
+                exchange.getResponse().setStatusCode(HttpStatus.BAD_REQUEST);
+                return exchange.getResponse().setComplete();
+            }
+			
+            return chain.filter(exchange.mutate().request(buildRequest).build());
+        }
+
+        @Override
+        public int getOrder() {
+            return -1;
+        }
+    }
+
+
+	
+	
+正向代理和反向代理的区别：
+	1、正向代理：类似我们想要访问国外的Google服务器，但是由于访问限制，我们需要找一个代理去访问。
+	换句话说，客户端明确知道要访问的服务器的地址，客户端把请求发送给代理，代理转发给服务器，服务器把响应传给代理，最后代理把响应传给客户端。
+	我们可以看到客户端知道服务器是谁，但是服务器并不知道客户端是谁，这就是正向代理，隐藏了客户端的真实信息。
+	简单一点：通过代理服务器来访问服务器的过程 就叫 正向代理。需要在客户端配置代理服务器进行指定网站访问
+	2、反向代理：类似我们访问淘宝，由于访问量巨大，淘宝会使用许多台服务器（就是分布式服务器）来支持，但是每个客户端的请求到底由哪一台服务器来响应，
+	我们需要一个代理来决定。换句话说，客户端并不知道要把请求发送给哪一台服务器，但是知道发送给哪一个代理，然后代理依据规则（响应时间，负载均衡等）
+	决定把请求转发给哪一台服务器。可以看到，客户端并不知道他访问的服务器是谁，这就是反向代理，隐藏了服务器的真实信息。	
+	
+nginx
+	需要配置再服务器端，才生效
+	server_name 为虚拟服务器的识别路径。因此不同的域名会通过请求头中的HOST字段，匹配到特定的server块，转发到对应的应用服务器中去。
+	location 指令说明
+		该指令用于匹配 URL。
+		语法如下：
+
+		1、= ：用于不含正则表达式的 uri 前，要求请求字符串与 uri 严格匹配，如果匹配 成功，就停止继续向下搜索并立即处理该请求。
+		2、~：用于表示 uri 包含正则表达式，并且区分大小写。
+		3、~*：用于表示 uri 包含正则表达式，并且不区分大小写。
+		4、^~：用于不含正则表达式的 uri 前，要求 Nginx 服务器找到标识 uri 和请求字 符串匹配度最高的 location 后，立即使用此 location 处理请求，而不再使用 location 块中的正则 uri 和请求字符串做匹配。
+
+		注意：如果 uri 包含正则表达式，则必须要有 ~ 或者 ~*标识。
+	动静分离
+		为了加快网站的解析速度，可以把动态页面和静态页面由不同的服务器来解析，加快解析速 度。降低原来单个服务器的压力。
+		
+Java中的getResourceAsStream有以下几种： 
+	https://www.cnblogs.com/macwhirr/p/8116583.html
+	
+	1. Class.getResourceAsStream(String path) ： path 不以’/'开头时默认是从此类所在的包下取资源，以’/'开头则是从ClassPath根下获取。
+			其只是通过path构造一个绝对路径，最终还是由ClassLoader获取资源。 
+
+	2. Class.getClassLoader.getResourceAsStream(String path) ：默认则是从ClassPath根下获取，path不能以’/'开头，最终是由ClassLoader获取资源。 
+
+	3. ServletContext.getResourceAsStream(String path)：默认从WebAPP根目录下取资源，Tomcat下path是否以’/'开头无所谓，当然这和具体的容器实现有关。 
+
+	4. Jsp下的application内置对象就是上面的ServletContext的一种实现。 
+	
+addResourceHandlers
+	https://blog.csdn.net/qq_39025156/article/details/90055132
+	//配置server虚拟路径，handler为jsp中访问的目录，locations为files相对应的本地路径
+	registry.addResourceHandler("/file/**").addResourceLocations(pathUtl).setCachePeriod(0);
+
+	
+jdk 1.8
+	forEach()跳出
+		* stream forEach是个方法，并不是循环体。
+		* return跳出方法，break跳出循环。
+		* stream forEach中return不再具有原来的含义，不会终止循环，而是和continue类似
+		* 可以通过抛出异常跳出stream for Each
+		* https://www.cnblogs.com/Marydon20170307/p/14207705.html
+
+
+	基础类型不能作为泛型参数
+		// int[] a= new int[]{1,2,3,33};
+        Integer[] a= new Integer[]{1,2,3,null};
+        List<Integer> list1 = Arrays.asList(a);
+		
+	函数式编程
+	
+	Map排序  comparingByKey  comparingByValue
+		final Map<String, Integer> wordCounts = new HashMap<>();
+		wordCounts.put("USA", 100);
+		wordCounts.put("jobs", 200);
+		wordCounts.put("software", 50);
+		wordCounts.put("technology", 70);
+		wordCounts.put("opportunity", 200);
+		 
+		//{USA=100, software=50, jobs=200, opportunity=200, technology=70}
+		1、正向 
+		final Map<String, Integer> sortedByCount = wordCounts.entrySet()
+						.stream()
+						.sorted(Map.Entry.comparingByValue())
+						.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
+		 
+		//{software=50, technology=70, USA=100, jobs=200, opportunity=200}
+		 
+		2、反向 reversed
+		final Map<String, Integer> sortedByCount1 = wordCounts.entrySet()
+						.stream()
+						.sorted((Map.Entry.<String, Integer>comparingByValue().reversed()))
+						.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
+		 
+		//{jobs=200, opportunity=200, USA=100, technology=70, software=50}
+		
+		LinkedHashMap<String, Integer> sortedMap2 = wordCounts.entrySet().stream()
+		.sorted((e1, e2) -> e1.getValue().compareTo(e2.getValue())).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e2, LinkedHashMap::new));
+
+java
+	Objects类
+		equals
+		deepEquals
+		hashCode
+		hash
+		toString
+		toString
+		compare
+		requireNonNull
+		requireNonNull
+		isNull
+		nonNull
+		requireNonNull
+		
+工具类需要实现私有构造方法
+	以某个工具类来说，如果其只提供静态参数和静态方法，则这个工具类完全不需要实例化。
+
+	然而，在缺少显式构造器的情况下，编译器会自动提供一个无参的，共有的构造函数。
+	所以为了避免这个情况，我们要主动的提供一个私有的无参构造函数来避免工具类自动实例化。
+	阻止生成对象可以防止不可预期的结果。
+ 
+单例设计模式的特点
+	构造方法私有化，在类的内部定义static方法和属性，
+	利用static方法取得本类的实例化对象。不管外部产生多少个Singleton类的对象，但是本质上只有一个唯一的实例化对象。
+	
+Collections.singleton(null)
+	返回一个仅包含给定object(obj)的不可变集合。	
+	
+Arrays.asList(a) 无法add
+
+时间戳
+	时间戳是指格林威治时间1970年01月01日00时00分00秒(北京时间1970年01月01日08时00分00秒)起至现在的总秒数。
+	通俗的讲, 时间戳是一份能够表示一份数据在一个特定时间点已经存在的完整的可验证的数据。
+	单位为秒（10位）
+	Date()转换是参数为毫秒（13位）
+	
+DateUtil.format(new SimpleDateFormat(DatePattern.NORM_DATE_PATTERN).parse(selectStartDate), DatePattern.NORM_DATE_FORMAT)
+
+split
+	StringUtils.split()是把分隔符拆成一个个单独的字符，再用这些字符去把字符串进行分割的。只要匹配到了分隔符中的任意一个字符，就会进行分割。
+	string.split()是把分隔符作为一个整体来对字符串进行分割。
+
+
+Integer无法引用传递
+	    private final int value;
+
+
+cn.hutool.core.bean
+	BeanUtil
+
+    public static Object getFieldValue(Object bean, String fieldNameOrIndex) {
+        if (null != bean && null != fieldNameOrIndex) {
+            if (bean instanceof Map) {
+                return ((Map)bean).get(fieldNameOrIndex);
+            } else if (bean instanceof Collection) {
+                return CollUtil.get((Collection)bean, Integer.parseInt(fieldNameOrIndex));
+            } else {
+                return ArrayUtil.isArray(bean) ? ArrayUtil.get(bean, Integer.parseInt(fieldNameOrIndex)) : ReflectUtil.getFieldValue(bean, fieldNameOrIndex);
+            }
+        } else {
+            return null;
+        }
+    }
+
+transient 
+	阻止变量序列化，不能修饰方法和类
+
+static修饰的变量无法序列化
+	被static修饰的属性是所有类共享的，如果可以序列化，就会出现下面的情况，
+	当我们序列化某个类的一个对象到某个文件后，这个文件中的对象的那个被static修饰的属性值会固定下来,
+	当另外一个普通的的对象修改了该static属性后,我们再去反序列化那个文件中的对象，
+	就会得到和后面的对象不同的static属性值，这显然违背了static关键字诞生的初衷。
+
+
+————————————————
+版权声明：本文为CSDN博主「escape-coder」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。
+原文链接：https://blog.csdn.net/mtfghhhhh/article/details/122575696
+
+java中的内存泄露的情况：长生命周期的对象持有短生命周期对象的引用就很可能发生内存泄露.
+
+尽管短生命周期对象已经不再需要，但是因为长生命周期对象持有它的引用而导致不能被回收，这就是java中内存泄露的发生场景。
+通俗地说，就是程序员可能创建了一个对象，以后一直不再使用这个对象，这个对象却一直被引用，即这个对象无用但是却无法被垃圾回收器回收的，
+这就是java中可能出现内存泄露的情况，例如，缓存系统，我们加载了一个对象放在缓存中(例如放在一个全局map对象中)，
+然后一直不再使用它，这个对象一直被缓存引用，但却不再被使用。
+————————————————
+原文链接：https://blog.csdn.net/hebtu666/article/details/114818801
+
+
+
+为什么要使用Base 64
+    Base 64主要用途不是加密，而是把一些二进制数转成普通字符，方便在网络上传输。 由于一些二进制字符在传输协议中属于
+	控制字符，不能直接传送，所以需要转换一下才可以。由于某些系统中只能使用ASCII字符，Base64就是用来将非ASCII字符的数
+	据转换成ASCII字符的一种方法，Base64特别适合在http，mime协议下快速传输数据。
+————————————————
+原文链接：https://blog.csdn.net/jiahao1186/article/details/83661862
+
+
+加密技术
+	双向加密
+		（1）对称加密：即加密与解密用的是同一把秘钥，常用的对称加密技术有DES、AES等。
+		（2）非对称加密：加密与解密用的是不同的秘钥，常用的非对称加密技术有RSA等。
+		
+		A用B的公钥（非对称加密）加密自己的秘钥m发送给B，同时A用秘钥m加密消息体发送给B；
+		B用自己的私钥解密接收到的秘钥，得到实际的的秘钥m，再用秘钥m解密消息体。
+		这样既避免了秘钥保存的问题，又避免了非对称加密算法开销很大的问题。
+		
+	单向加密
+		MD5
+		
+	
+	
+	
+Jwt Token
+	
+	
+	
+	
+OAuth2.0
+	OAuth 就是一种授权机制。数据的所有者告诉系统，同意授权第三方应用进入系统，获取这些数据。
+	系统从而产生一个短期的进入令牌（token），用来代替密码，供第三方应用使用
+	
+—————————————————————————————————————lean-Spring——————————————————————————————————————————————————	
+WebMvcConfigurer
+	https://blog.csdn.net/zhangpower1993/article/details/89016503
+
+Spring Security	
+	原文链接：https://blog.csdn.net/qq_22172133/article/details/86503223
+
+	本质一个过滤器链，run.getBean(DefaultSecurityFilterChain.class) 查看默认过滤器链。
+	密码前加{noop}, 不加密密码，明文比较
+	anonymous() 允许匿名用户访问,不允许已登入用户访问
+	permitAll() 不管登入,不登入 都能访问
+	
+	认证（登陆）过程就是又前三项构成的。在Spring Security中是这样处理这三部分的：
+
+		1.username和password被获得后封装到一个UsernamePasswordAuthenticationToken（Authentication接口的实例）的实例中，
+			new UsernamePasswordAuthenticationToken(username, password) setAuthenticated false 表示未认证通过
+
+		2.这个token被传递给AuthenticationManager进行验证
+
+		3.成功认证后AuthenticationManager将返回一个得到完整填充的Authentication实例
+
+		4.通过调用SecurityContextHolder.getContext().setAuthentication(authentication)，来建立安全上下文（security context）	
+	
+	一般接口校验过程：
+
+		1.一般接口调用时，会被自定义的JWT过滤器（放在UsernamePasswordAuthenticationFilter.class前）拦截，校验传入的token是否合规
+		
+		2.校验通过后，封装UsernamePasswordAuthenticationToken实例
+			new UsernamePasswordAuthenticationToken(username, null, null) setAuthenticated true 表示已经认证通过
+		
+		3.通过调用SecurityContextHolder.getContext().setAuthentication(authentication)，来建立安全上下文（security context）	
+
+
+	UsernamePasswordAuthenticationToken authenticationToken =
+		new UsernamePasswordAuthenticationToken(authUser.getUsername(), password);
+	Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+	SecurityContextHolder.getContext().setAuthentication(authentication);
+	
+Security用户密码验证流程
+	Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+		org.springframework.security.authentication.dao.AbstractUserDetailsAuthenticationProvider authenticate()
+			org.springframework.security.authentication.dao.DaoAuthenticationProvider retrieveUser() 
+				UserDetailsService loadUserByUsername() 重写UserDetailsService，获取用户信息	
+					this.preAuthenticationChecks.check(user); 校验账号状态
+					org.springframework.security.authentication.dao.DaoAuthenticationProvider 比较密码
+						this.additionalAuthenticationChecks(user, (UsernamePasswordAuthenticationToken)authentication);
+							-> !this.passwordEncoder.matches(presentedPassword, userDetails.getPassword()) 
+
+
+
+Spring Security实现登录的功能需要做哪些操作：
+	1.认证用户实现UserDetails接口，LoginUser实体类
+	2.用户来源的Service实现UserDetailsService接口，实现loadUserByUsername()方法，从数据库中获取用户数据，用于比较密码等
+	3.实现自己的过滤器继承OncePerRequestFilter，重写doFilterInternal()
+	3.实现自己的过滤器继承UsernamePasswordAuthenticationFilter，重写attemptAuthentication()和successfulAuthentication()方法实现自己的逻辑
+	4.Spring Security的配置类继承自WebSecurityConfigurerAdapter，重写里面的两个config()方法
+	5.如果使用RSA非对称加密，就准备好RSA的配置类，然后在启动类中加入注解将其加入IOC容器中
+		BCryptPasswordEncoder()
+	————————————————
+	原文链接：https://blog.csdn.net/weixin_43461520/article/details/107941983/
+	
+会话
+	用户认证通过后，为了避免用户的每次操作都进行认证可将用户的信息保证在会话中。
+	会话就是系统为了保持当前用户的登录状态所提供的机制，常见的有基于session方式、基于token方式等。
+		基于session的认证方式由Servlet规范定制，服务端要存储session信息需要占用内存资源，客户端需要支持cookie；
+		基于token的方式则一般不需要服务端存储token，并且不限制客户端的存储方式。
+
+不支持POST：
+	RESTful技术与CSRF(Cross-site request forgery跨站请求伪造)的冲突：
+	  CSRF默认支持的方法： GET|HEAD|TRACE|OPTIONS，不支持POST
+
+
+过滤器超类
+	GenericFilterBean，所以我们知道，genericFilterBean是任何类型的过滤器的一个比较方便的超类，
+	这个类主要实现的就是从web.xml文件中取得init-param中设定的值，然后对Filter进行初始化（当然，其子类可以覆盖init方法）。
+
+	OncePerRequestFilter继承自GenericFilterBean，那么它自然知道怎么去获取配置文件中的属性及其值，
+	所以其重点不在于取值，而在于确保在接收到一个request后，每个filter只执行一次，
+	它的子类只需要关注Filter的具体实现即doFilterInternal。
+
+	AbstractRequestLoggingFilter是对OncePerRequestFilter的扩展，它除了遗传了其父类及祖先类的所有功能外，
+	还在doFilterInternal中决定了在过滤之前和之后执行的事件，它的子类关注的是beforeRequest和afterRequest。
+
+bootstrap.yml与application.yml
+	bootstrap先执行，用于应用程序上下文的引导阶段
+	bootstrap属性有高优先级，默认情况下，它们不会被本地配置覆盖
+	
+@SpringBootApplication
+	启动时会默认扫描主类当前包及子包，如果需要扫描主类当前包外的其他包或不扫描当前包下的特定包或类，可通过下列属性实现：	
+	@EnableFeignClients(basePackages = {"com.feign.api.util"}) // feign接口不在主类包下时
+	@SpringBootApplication(scanBasePackages = {"com.feign.api.util"})
+	
+@Mapper
+	mybatis自身的注解，它不需要在Spring中配置扫描地址，通过xml里面的namespace里面的接口地址，生成Bean后注入到Service层中
+
+@Repository
+	spring提供的注解，能够将该类注册成Bean。被依赖注入，但是使用该注解后，
+	在启动类上要加@MapperScan来表名Mapper类的位置，否则扫描不到。
+
+	MapperScan注解是指定要变成实现类的接口所在的包，然后包下面的所有接口在编译之后都会生成相应的实现类。
+	
+@ComponentScan
+	@ComponentScan({"com.lean.cloud.service", "com.gateway"}) 
+	// 非启动类所在包时，需要指定扫描包名。此处有坑，配置了其他包时，不配置当前启动类所在包会导致扫描不到controller
+	仅扫描指定路径下被@Component标注的类
+	
+@Configuration
+		组件依赖调用 bean user1()调用bean user2()
+		proxyBeanMethods = true 代理增强，不生成新的bean，直接从IOC容器取
+		proxyBeanMethods = false 不进行增强，每次生成新的bean，启动快
+
+@ConfigurationProperties 属性绑定
+	@Component
+	@ConfigurationProperties(prefix = "task.pool")
+	===
+	@EnableConfigurationProperties(AsyncTaskProperties.class)
+	@ConfigurationProperties(prefix = "task.pool")
+	
+@Conditional
+	条件装配：满足Conditional指定的条件，则进行组件注入
+
+@Autowired
+	默认按类型进行自动装配（该注解属于Spring），默认情况下要求依赖对象必须存在，
+	如果要允许为null，需设置required属性为false，例：@Autowired(required=false)。
+	如果要使用名称进行装配，可以与@Qualifier注解一起使用。
+
+    @Autowired
+    @Qualifier("adminService")
+    private AdminService adminService;
+@Resource
+	默认按照名称进行装配（该注解属于J2EE），名称可以通过name属性来指定。
+	如果没有指定name属性，当注解写在字段上时，默认取字段名进行装配；
+	如果注解写在setter方法上，默认取属性名进行装配。
+	当找不到与名称相匹配的Bean时，会按照类型进行装配。但是，name属性一旦指定，就只会按照名称进行装配。
+	
+getBean("beanID")
+	当我们需要根据比如配置信息等来动态装配不同的组件时，可以用getBean("beanID")。
+	实现ApplicationContextAware接口，通过ApplicationContext获取bean
+
+@Autowired/new
+	@Autowired是从IOC容器中获取已经初始化的对象，
+	此对象中@Autowired的属性也已经通过容器完成了注入，整个生命周期都交由容器管控。
+	然而通过new出来的对象，生命周期不受容器管控，自然也无法完成属性的自动注入。
+
+new/newInstance
+	new关键字能调用任何构造方法。
+    newInstance()只能调用无参构造方法。
+	
+    new关键字是强类型的，效率相对较高。
+    newInstance()是弱类型的，效率相对较低。
+	
+	
+为什么@Autowired不能注入static成员属性
+	静态变量是属于类本身的信息，当类加载器加载静态变量时，Spring的上下文环境还没有被加载，
+	所以不可能为静态变量绑定值（这只是最表象原因，并不准确）。
+	同时，Spring也不鼓励为静态变量注入值（言外之意：并不是不能注入），因为它认为这会增加了耦合度，对测试不友好。
+	根本原因：扫描Class类需要注入的元数据的时候，直接选择忽略掉了static成员（包括属性和方法）。
+	
+	注入方法：
+		private static String code = null;
+		@Autowired
+		private setCode(String coode) {
+			this.code = code;
+		}
+		
+@Transactional
+	事务失效 https://blog.csdn.net/xiaoanzi123/article/details/105551268
+			 https://blog.csdn.net/hellozhxy/article/details/109753711
+	事务传播	@Transactional(propagation = Propagation.REQUIRES_NEW) 
+	原文链接：https://blog.csdn.net/wangjunjun2008/article/details/53669951
+
+	REQUIRES_NEW 
+		内层Service的方法被调用时，外层方法的事务被挂起；
+		内层事务相对于外层事务是完全独立的，有独立的隔离性等等。
+		REQUIRES_NEW失效
+			原因是spring只有跨service调用时才会生成新事务。
+			跨service时执行org.springframework.aop.framework.CglibAopProxy.DynamicAdvisedInterceptor.intercept()，事务才会生效。
+			A方法（有事务）调用B方法（要独立新事务），如果两个方法写在同一个类里，spring的事务会只处理能同一个。
+			解决方案1：需要将两个方法分别写在不同的类里。
+			解决方案2：方法写在同一个类里，但调用B方法的时候，将service自己注入自己，用这个注入对象来调用B方法。
+
+@Component默认是单例还是多例？
+	@Component注解默认实例化的对象是单例，如果想声明成多例对象可以使用@Scope("prototype")
+	@Repository默认单例
+	@Service默认单例
+	@Controller默认多例
+
+@Scope
+	a.singleton单例模式 -- 全局有且仅有一个实例
+	b.prototype原型模式 -- 每次获取Bean的时候会有一个新的实例
+	c.request -- request表示该针对每一次HTTP请求都会产生一个新的bean，同时该bean仅在当前HTTP request内有效
+	d.session -- session作用域表示该针对每一次HTTP请求都会产生一个新的bean，同时该bean仅在当前HTTP session内有效
+	e.globalsession -- global session作用域类似于标准的HTTP Session作用域，不过它仅仅在基于portlet的web应用中才有意义
+
+@Scope注解的使用场景
+	几乎90%以上的业务使用singleton单实例就可以，所以spring默认的类型也是singleton，
+	singleton虽然保证了全局是一个实例，对性能有所提高，
+	但是如果实例中有非静态变量时，会导致线程安全问题，共享资源的竞争
+
+	当设置为prototype时：每次连接请求，都会生成一个bean实例，
+	也会导致一个问题，当请求数越多，性能会降低，因为创建的实例，导致GC频繁，gc时长增加
+
+@RequestMapping
+	
+	consumes： 指定处理请求的提交内容类型（Content-Type），例如application/json, text/html;
+	produces:  指定返回的内容类型，仅当request请求头中的(Accept)类型中包含该指定类型才返回；
+			   方法仅处理request请求中Accept头中包含了"application/json"的请求，同时暗示了返回的内容类型为application/json;
+	consumes ，允许的媒体类型（ Media Types ），如 consumes application/ison”， 对应
+	于请求的 HTTP Content-Type
+	produces ，相应的媒体类型，如 produces application/json”， 对应于HTTP Accept宇段。
+	————————————————
+	原文链接：https://blog.csdn.net/qq_16605855/article/details/82415328
+	
+@RequestParam @RequestBody
+	@RequestParam 
+		控制是否必传
+		name即为value(不写时，值为字段名)
+	
+	在Content-Type: application/x-www-form-urlencoded的请求中，get 方式中queryString的值，
+	和post方式中 body data的值都会被Servlet接受到并转化到Request.getParameter()参数集中，所以@RequestParam可以获取的到。
+	
+	@RequestBody接受的参数是不会被Servlet转化统一放在request对象的Param参数集中，@RequestParam是可以的。
+	https://www.cnblogs.com/muxi0407/p/11764140.html
+	
+	@RequestBody
+		接收的参数是来自requestBody中，即请求体。
+		一般用于处理非 Content-Type: application/x-www-form-urlencoded编码格式的数据，
+		比如：application/json、application/xml等类型的数据。
+		后台服务发起的GET请求也可以用@RequestBody接收，需要将参数设置请求体中。
+		原文链接：https://blog.csdn.net/weixin_38004638/article/details/99655322
+	
+	// 获取请求参数
+	HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+	request.getParameter(name);
+	
+Application/octet-stream	
+	当浏览器在请求资源时，会通过http返回头中的content-type决定如何显示/处理将要加载的数据，
+	如果这个类型浏览器能够支持阅览，浏览器就会直接展示该资源，比如png、jpeg、video等格式。
+	在某些下载文件的场景中，服务端可能会返回文件流，并在返回头中带上Content-Type:application/octet-stream，
+	告知浏览器这是一个字节流，浏览器处理字节流的默认方式就是下载。
+	Application/octet-stream是应用程序文件的默认值。意思是未知的应用程序文件，浏览器一般不会自动执行或询问执行。
+	浏览器会像对待，设置了HTTP头Content-Disposition值为attachment的文件一样来对待这类文件，即浏览器会触发下载行为。
+	说人话就是，浏览器并不认得这是什么类型，也不知道应该如何展示，只知道这是一种二进制文件，
+	因此遇到content-type为application/octet-stream的文件时，浏览器会直接把它下载下来。
+	这个类型一般会配合另一个响应头Content-Disposition,该响应头指示回复的内容该以何种形式展示，
+	是以内联的形式（即网页或者网页的一部分）（inline;），还是以附件的形式下载并保存到本地（attachment;）。
+	————————————————
+	原文链接：https://blog.csdn.net/qq_42582773/article/details/121807555
+
+	
+MultipartFile
+	@RequestParam MultipartFile file
+	MultipartFile属于临时文件，在Controller返回后会被销毁
+	
+@Valid
+@Validated
+		<dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
+		->> hibernate-validator
+		
+原文链接：https://blog.csdn.net/qq_27680317/article/details/79970590
+	参数校验
+	@Validated：用在方法入参上无法单独提供嵌套验证功能。不能用在成员属性（字段）上，也无法提示框架进行嵌套验证。能配合嵌套验证注解@Valid进行嵌套验证。
+
+	@Valid：用在方法入参上无法单独提供嵌套验证功能。能够用在成员属性（字段）上，提示验证框架进行嵌套验证。能配合嵌套验证注解@Valid进行嵌套验证。
+
+Spring两大特性：
+	原文链接：https://blog.csdn.net/dkbnull/article/details/87219562
+	控制反转IoC
+		控制反转，简单点说，就是创建对象的控制权，被反转到了Spring框架上。
+		通常，我们实例化一个对象时，都是使用类的构造方法来new一个对象，
+		这个过程是由我们自己来控制的，而控制反转就把new对象的工交给了Spring容器。
+		
+		IoC的主要实现方式有两种：依赖查找、依赖注入。
+		IoC容器：
+			具有依赖注入功能的容器，可以创建对象的容器。IoC容器负责实例化、定位、配置应用程序中的对象并建立这些对象之间的依赖。
+
+		DI 依赖注入：
+			由IoC容器动态地将某个对象所需要的外部资源（包括对象、资源、常量数据）注入到组件(Controller, Service等）之中。
+			简单点说，就是IoC容器会把当前对象所需要的外部资源动态的注入给我们。
+			Spring依赖注入的方式主要有四个，基于注解注入方式、set注入方式、构造器注入方式、静态工厂注入方式。
+				推荐使用基于注解注入方式，配置较少，比较方便。
+				事实上，spring在4.x版本后就推荐使用构造器的方式的来注入fileld
+				官方推荐理由：
+				单一职责: 当使用构造函数注入的时候，你会很容易发现参数是否过多，这个时候需要考虑你这个类的职责是否过大，考虑拆分的问题；而当使用@Autowired注入field的时候，不容易发现问题
+
+				依赖不可变: 只有使用构造函数注入才能注入final
+
+				依赖隐藏:使用依赖注入容器意味着类不再对依赖对象负责，获取依赖对象的职责就从类抽离出来，IOC容器会帮你自动装备。这意味着它应该使用更明确清晰的公用接口方法或者构造器，这种方式就能很清晰的知道类需要什么和到底是使用setter还是构造器
+
+				降低容器耦合度: 依赖注入框架的核心思想之一是托管类不应依赖于所使用的DI容器。换句话说，它应该只是一个普通的POJO，只要您将其传递给所有必需的依赖项，就可以独立地实例化。这样，您可以在单元测试中实例化它，而无需启动IOC容器并单独进行测试（使用一个可以进行集成测试的容器）。如果没有容器耦合，则可以将该类用作托管或非托管类，甚至可以切换到新的DI框架
+				原文链接：https://blog.csdn.net/smilecjw/article/details/107669224
+			
+	面向切面编程AOP
+		在AOP中切面就是与业务逻辑独立，但又垂直存在于业务逻辑的代码结构中的通用功能组合；
+		切面与业务逻辑相交的点就是切点；连接点就是把业务逻辑离散化后的关键节点；
+		切点属于连接点，是连接点的子集；Advice（增强）就是切面在切点上要执行的功能增加的具体操作；
+		在切点上可以把要完成增强操作的目  标对象（Target）连接到切面里，这个连接的方式就叫织入
+		动态代理
+			
+		静态代理
+		AOP主要一般应用于签名验签、参数校验、日志记录、事务控制、权限控制、性能统计、异常处理等。
+
+
+Spring Boot自动装配原理	
+	@EnableAutoConfiguration
+		-> @Import({AutoConfigurationImportSelector.class})
+			-> getAutoConfigurationEntry(AutoConfigurationMetadata autoConfigurationMetadata, AnnotationMetadata annotationMetadata)
+				-> List<String> configurations = this.getCandidateConfigurations(annotationMetadata, attributes);
+					-> SpringFactoriesLoader.loadFactoryNames(this.getSpringFactoriesLoaderFactoryClass(), this.getBeanClassLoader())
+						-> loadSpringFactories
+							-> classLoader.getResources("META-INF/spring.factories")
+								默认扫描我们当前系统里面所有META-INF/spring.factories位置的文件
+								spring-boot-autoconfigure-2.3.4.RELEASE.jar包里面也有META-INF/spring.factories
+								全部加载，按需配置生效 @ConditionalOnClass
+
+	Spring Boot启动的时候会通过@EnableAutoConfiguration注解找到META-INF/spring.factories配置文件中的所有自动配置类，并对其进行加载，
+	而这些自动配置类都是以AutoConfiguration结尾来命名的，它实际上就是一个JavaConfig形式的Spring容器配置类，
+	它能通过以Properties结尾命名的类中取得在全局配置文件中配置的属性如：server.port，
+	而XxxxProperties类是通过@ConfigurationProperties注解与全局配置文件中对应的属性进行绑定的。
+	
+	spring默认配置好了所有组件，如果用户也进行了配置，以用户配置为准 @ConditionalOnMissingClass @ConditionalOnMissingBean
+
+
+
+X-Frame-Options
+	主要用处是用于防止点击劫持，点击劫持（ClickJacking）是一种视觉上的欺骗手段。
+	攻击者使用一个透明的iframe，覆盖在一个网页上，然后诱使用户在网页上进行操作，
+	此时用户将在不知情的情况下点击透明的iframe页面。通过调整iframe页面的位置，
+	可以诱使用户恰好点击在iframe页面的一些功能性按钮上。 
+	HTTP响应头信息中的X-Frame-Options，可以指示浏览器是否应该加载一个iframe中的页面。
+	如果服务器响应头信息中没有X-Frame-Options，则该网站存在ClickJacking攻击风险。
+	网站可以通过设置X-Frame-Options阻止站点内的页面被其他页面嵌入从而防止点击劫持。
+
+	X-Frame-Options响应头
+		DENY：不能被嵌入到任何iframe或者frame中。
+		SAMEORIGIN：页面只能被本站页面嵌入到iframe或者frame中
+		ALLOW-FROM uri：只能被嵌入到指定域名的框架中
+		解决方案
+		从这里就可以看到，是因为Spring Security默认设置X-Frame-Options响应头是 DENY，
+		也就是不能被嵌入到任何iframe中，这也造成了我们无法正常显示eureka页面，
+		所以我们需要在Spring Security的配置文件中设置关闭X-Frame-Options即可，也就是加入下面这句
+
+		http.headers().frameOptions().disable();
+
+Bean初始化
+	Spring为bean提供了两种初始化bean的方式：
+		实现InitializingBean接口，实现afterPropertiesSet方法，
+		或者在配置文件中通过init-method指定，两种方式可以同时使用。
+
+	实现InitializingBean接口是直接调用afterPropertiesSet方法，比通过反射调用init-method指定的方法效率要高一点，但是init-method方式消除了对spring的依赖。
+
+	如果调用afterPropertiesSet方法时出错，则不调用init-method指定的方法。
+	————————————————
+	原文链接：https://blog.csdn.net/qq_37705525/article/details/124808168
+
+
+
+
+jar包替换
+	先 jar -xvf ***.jar 解压要替换的jar
+	替换后jar -cfM0 XX.jar ./ 命令打打包成jar
+
+———————————————————————————————————————————————————————————————————————————————————————
+	
+poi
+	Excel，替换公式，在动态插入行之前写入公式会导致公式计算行数出错
+	
+	
+	
+	
+	
+覆盖索引
+	解决LIKE以%开头会导致索引失效
+		EXPLAIN SELECT id, name, salary FROM staff WHERE name LIKE '%Alice%';
+
+		当真的需要两边都使用%来模糊查询时，只有当这个作为模糊查询的条件字段（例子中的name）
+		以及所想要查询出来的数据字段（例子中的 id & name & age）都在索引列上时，才能真正使用索引，
+		否则，索引失效全表扫描（比如多了一个 salary 字段）
+		
+		
+InnoDB创建索引的具体规则		
+	在表上定义主键PRIMARY KEY，InnoDB将主键索引用作聚簇索引。
+	如果表没有定义主键，InnoDB会选择第一个不为NULL的唯一索引列用作聚簇索引。
+	如果以上两个都没有，InnoDB 会使用一个6 字节长整型的隐式字段 ROWID字段构建聚簇索引。该ROWID字段会在插入新行时自动递增。
+	————————————————
+	原文链接：https://blog.csdn.net/qq_35190492/article/details/109257302
+	
+
+多个单列索引和联合索引的区别详解：
+	利用索引中的附加列，您可以缩小搜索的范围，但使用一个具有两列的索引 不同于使用两个单独的索引。复合索引的结构与电话簿类似，人名由姓和名构成，电话簿首先按姓氏对进行排序，然后按名字对有相同姓氏的人进行排序。如果您知道姓，电话簿将非常有用；如果您知道姓和名，电话簿则更为有用，但如果您只知道名不姓，电话簿将没有用处。
+
+	所以说创建复合索引时，应该仔细考虑列的顺序。对索引中的所有列执行搜索或仅对前几列执行搜索时，复合索引非常有用；仅对后面的任意列执行搜索时，复合索引则没有用处。
+
+	重点：
+
+	多个单列索引在多条件查询时优化器会选择最优索引策略，可能只用一个索引，也可能将多个索引全用上！ 
+	但多个单列索引底层会建立多个B+索引树，比较占用空间，也会浪费一定搜索效率，
+	故如果只有多条件联合查询时最好建联合索引！
+
+最左前缀原则：
+
+	顾名思义是最左优先，以最左边的为起点任何连续的索引都能匹配上，
+	注：如果第一个字段是范围查询需要单独建一个索引
+	注：在创建联合索引时，要根据业务需求，where子句中使用最频繁的一列放在最左边。这样的话扩展性较好，比如 userid 经常需要作为查询条件，而 mobile 不常常用，则需要把 userid 放在联合索引的第一位置，即最左边
+
+	同时存在联合索引和单列索引（字段有重复的），这个时候查询mysql会怎么用索引呢？
+
+	这个涉及到mysql本身的查询优化器策略了，当一个表有多条索引可走时, Mysql 根据查询语句的成本来选择走哪条索引；
+
+	有人说where查询是按照从左到右的顺序，所以筛选力度大的条件尽量放前面。网上百度过，很多都是这种说法，但是据我研究，mysql执行优化器会对其进行优化，当不考虑索引时，where条件顺序对效率没有影响，真正有影响的是是否用到了索引！
+
+联合索引本质：
+	当创建**(a,b,c)联合索引时，相当于创建了(a)单列索引**，(a,b)联合索引以及**(a,b,c)联合索引**
+	想要索引生效的话,只能使用 a和a,b和a,b,c三种组合；当然，我们上面测试过，a,c组合也可以，但实际上只用到了a的索引，c并没有用到！
+	注：这个可以结合上边的 通俗理解 来思考！
+
+其他知识点：
+	1、需要加索引的字段，要在where条件中
+	2、数据量少的字段不需要加索引；因为建索引有一定开销，如果数据量小则没必要建索引（速度反而慢）
+	3、避免在where子句中使用or来连接条件，因为如果俩个字段中有一个没有索引的话，引擎会放弃索引而产生全表扫描
+	4、联合索引比对每个列分别建索引更有优势，因为索引建立得越多就越占磁盘空间，在更新数据的时候速度会更慢。
+	5、另外建立多列索引时，顺序也是需要注意的，应该将严格的索引放在前面，这样筛选的力度会更大，效率更高。
+	————————————————
+	原文链接：https://blog.csdn.net/Abysscarry/article/details/80792876	
+	
+	
+	
+mybatis 配置
+	mybatis:
+	  mapper-locations: classpath*:mapper/*.xml
+	  type-aliases-package: com.lean.cloud.entity
+	  configuration: # mybatis全局配置
+		cache-enabled: true
+		local-cache-scope: session
+	
+	
+	
+	
+	
+war tomacte
+jar 内置 Tomcat	
+	
+———————————————————————————————————————————————————————————————————————————————————————
+	
+docker	
+	镜像：文件（工具、依赖等）
+	容器：进程（运行镜像）
+	
+———————————————————————————————————————————————————————————————————————————————————————
+	
+Nacos	
+	启动 
+		单机模式 startup.cmd -m standalone
+		集群模式 startup.cmd -m cluster
+			需要配置db
+
+
+
+		
+	配置中心？
+	openFeign负载均衡策略、熔断无效？
+	
+	
+	nacos中ribbon会造成loadbalanc包失效
+		spring-cloud-starter-alibaba-nacos-discovery
+		<exclusion>	-> spring-cloud-starter-netflix-ribbon
+						-> ribbon-loadbalancer
+		
+		<include> spring-cloud-starter-loadbalancer  +  ribbon-loadbalancer
+
+———————————————————————————————————————————————————————————————————————————————————————
+
+RabbitMq
+	
+
+
+
+curl -H "Content-Type:application/json" -X POST -d '{"service":10,"partId":"2354325235"}' 'http://www.baidu.ad/getapi'
+
+
+
+Elasticseach(8.4.1)
+	初始账号为elastic，第一次启动es，密码会在cmd中出现
+	修改密码
+		.\elasticsearch-reset-password --username elastic -i
+
+	xpack.security.enabled: true
+		es8之前默认是不开启TLS,无需登陆，所以http://127.0.0.1:9200/可以访问；
+		es8之后默认开启TLS,需要登陆，必须得用https://127.0.0.1:9200/才可以访问
+		同时影响kibana配置的eshost：elasticsearch.hosts
+
+	kibana
+		版本需要保持一致
+		无法启动时，需注意elasticsearch.hosts是否正确
+		
+	elasticsearch-head
+		打开无集群连接	
+			1、需要在es的yml配置允许跨域
+			2、x-pack开启导致：？
+			
+		http.cors.enabled: true
+		http.cors.allow-origin: "*"
+
+
+	elasticsearch-analysis-ik
+		版本需要保持一致
+		https://github.com/medcl/elasticsearch-analysis-ik
+		下载解压至es plugins
+
+		首先是 ik_smart，最少切分；此次是 ik_max_word，最细粒度划分。
+		如果想设置自己的词典，可以在ik的config里面自己加入一个my.dic，然后记得把这个放入IKAnalyzer.cfg.xml文件中。
+			GET _analyze
+			{
+			  "analyzer": "ik_max_word",
+			  "text":"中华人民"
+			}
+
+
+
+
+
+
+
+	
