@@ -1,0 +1,153 @@
+vue 实例》》》》》》》》》
+    var app = new Vue({
+        el:'#app',
+        data:{
+            // content:'helloword!'
+            list:["111","222"],
+            inval:""
+        },
+		template："<h1>{{content}}</h1>",
+        methods:{
+            btnclick: function(){
+                // alert(this.inval)
+
+                // this.list.push(this.inval); //三种操作data内变量方式
+                // app.$data.list.push(this.inval);
+                app.list.push(this.inval);
+
+                this.inval="";
+            }
+        }
+    });
+
+
+
+挂载点、模板、实例》》》》》》
+
+	挂载点：el:"#id"
+	模板：挂载点中的部分，也可以放在实例template中。没有定义template时会去挂载点找。template下只能有一个根标签
+	new Vue({});
+	
+{{}} //插值表达式 内部为js表达式
+v-text //不转义 内部为js表达式
+v-html //转义 内部为js表达式
+
+v-on:click   等价于 @click//事件绑定
+v-bind:title="inval"  等价于 :title="inval"  <!-- 属性 绑定--> //绑定title 单向
+v-model="inval"   //双向 数据 绑定
+v-slot:header 可以被重写为 #header
+
+v-if //false时会从dom上清除对应元素 是否存在
+v-show //false时设置display：none  是否显示
+
+v-for="(item,index) in list" :key="index"  //key不可重复
+
+实现 fullname = firstname +lastname》》》
+	computed:计算属性--计算属性的结果会被缓存，除非依赖的响应式属性变化才会重新计算
+	watch：监听器--拥有缓存功能，代码相对复杂
+	methods：自定义函数--不具备缓存
+
+组件和实例的关系》》》》》
+	每个组件也是一个vue实例
+
+	
+Vue子组件data必须是函数的理解》》》》》》》》》
+	在组件中，因为可能在多处调用同一组件，为了不让多处的组件共享同一data对象，只能返回函数。
+	为了理解这种机制，我们假设data为一个对象，那么这同一个对象有可能被很多实例共享，一个实例改变其它也会跟着变，这明显是不对的。
+	而通过data函数，每新建一个实例，都会调用data来return一组新的原始数据。
+	
+父组件子组件之间通过属性传值。
+	父》子：通过props传递数据，关键点--父：v-bind: ="inval" 子: props['inval']  
+			单向数据流：子组件不要修改父组件传来的参数,可以克隆一个副本************
+			
+	子》父：通过自定义事件（发布订阅模式），关键点--父：@del="delli" 子: this.$emit("del",index)   
+				//delli由父组件实现 ，index是参数，子组件触发父组件监听的del事件
+	
+	
+	
+ 用key 管理可复用的元素，key值不同的相同元素不会复用 。key值要唯一，尽量不要使用index，一般使用后台传来的id。
+ 
+ 
+ is 》》》》<tr is="todo"></tr> 有些 HTML 元素，诸如 <ul>、<ol>、<table> 和 <select>，对于哪些元素可以出现在其内部是有严格限制的。
+			而有些元素，诸如 <li>、<tr> 和 <option>，只能出现在其它某些特定的元素内部。
+			
+			
+自定义事件、原生事件》》》》》》触发子组件click。。。。。
+
+
+同一节点中，v-for 的优先级比 v-if 更高，这意味着 v-if 将分别重复运行于每个 v-for 循环中
+
+
+深入响应式原理？
+	当你把一个普通的 JavaScript 对象传给 Vue 实例的 data 选项，Vue 将遍历此对象所有的属性，并使用 Object.defineProperty 把这些属性全部转为 getter/setter。
+	Object.defineProperty 是 ES5 中一个无法 shim 的特性，这也就是为什么 Vue 不支持 IE8 以及更低版本浏览器。
+	每个组件实例都有相应的 watcher 实例对象，它会在组件渲染的过程中把属性记录为依赖，之后当依赖项的 setter 被调用时，会通知 watcher 重新计算，从而致使它关联的组件得以更新。
+	受现代 JavaScript 的限制 (而且 Object.observe 也已经被废弃)，Vue 不能检测到对象属性的添加或删除。由于 Vue 会在初始化实例时对属性执行 getter/setter 转化过程，
+	所以属性必须在 data 对象上存在才能让 Vue 转换它，这样才能让它是响应的。
+	
+	vue中对象属性改变视图不更新问题 解决方法：
+	Vue.set(vm.someObject, 'b', 2)
+	
+	this.$set(this.someObject,'b',2)
+	
+	this.someObject = Object.assign({}, this.someObject, { a: 1, b: 2 })
+	Object.assign 方法只会拷贝源对象自身的并且可枚举的属性到目标对象。该方法使用源对象的[[Get]]和目标对象的[[Set]]，所以它会调用相关 getter 和 setter。
+	因此，它分配属性，而不仅仅是复制或定义新的属性。
+	
+	
+	
+	
+
+链接：https://zhuanlan.zhihu.com/p/53703176
+什么是 MVVM , 和 MVC 是什么区别, 原理是什么?
+　　mvc的界面和逻辑关联紧密，数据直接从数据库读取，必须通过Controller来承上启下，通信都是单向的。
+	mvvm的View 和 ViewModel可以互相通信，界面数据从viewmodel中获取。
+
+	MVVM 是 Model-View-ViewModel 的缩写。mvvm 是一种设计思想。Model 层代表数据模型，也可以在 Model 中定义数据修改和操作的业务逻辑；View 代表 UI 组件，
+	它负责将数据模型转化成 UI 展现出来，ViewModel 是一个同步 View 和 Model 的对象。
+	在 MVVM 架构下，View 和 Model 之间并没有直接的联系，而是通过 ViewModel 进行交互，Model 和 ViewModel 之间的交互是双向的， 
+	因此 View 数据的变化会同步到 Model 中，而 Model 数据的变化也会立即反应到 View 上。
+	ViewModel 通过双向数据绑定把 View 层和 Model 层连接了起来，而 View 和 Model 之间的同步工作完全是自动的，无需人为干涉，
+	因此开发者只需关注业务逻辑，不需要手动操作 DOM, 不需要关注数据状态的同步问题，复杂的数据状态维护完全由 MVVM 来统一管理。
+
+mvvm 和 mvc 区别？
+	mvc 和 mvvm 其实区别并不大。都是一种设计思想。主要就是 mvc 中 Controller 演变成 mvvm 中的 viewModel。
+	mvvm 主要解决了 mvc 中大量的 DOM 操作使页面渲染性能降低，加载速度变慢，影响用户体验。和当 Model 频繁发生变化，
+	开发者需要主动更新到 View 。
+
+vue 的优点是什么？
+	低耦合。视图（View）可以独立于 Model 变化和修改，一个 ViewModel 可以绑定到不同的"View"上，当 View 变化的时候 Model 可以不变，当 Model 变化的时候 View 也可以不变。
+	可重用性。你可以把一些视图逻辑放在一个 ViewModel 里面，让很多 view 重用这段视图逻辑。
+	独立开发。开发人员可以专注于业务逻辑和数据的开发（ViewModel），设计人员可以专注于页面设计，使用 Expression Blend 可以很容易设计界面并生成 xml 代码。
+	可测试。界面素来是比较难于测试的，而现在测试可以针对 ViewModel 来写。	
+	
+vue生命周期的理解？
+	答：总共分为 8 个阶段创建前/后，载入前/后，更新前/后，销毁前/后。
+
+	创建前/后： 在 beforeCreate 阶段，vue 实例的挂载元素 el 还没有。
+	载入前/后：在 beforeMount 阶段，vue 实例的$el 和 data 都初始化了，但还是挂载之前为虚拟的 dom 节点，data.message 还未替换。在 mounted 阶段，vue 实例挂载完成，data.message 成功渲染。
+	更新前/后：当 data 变化时，会触发 beforeUpdate 和 updated 方法。
+	销毁前/后：在执行 destroy 方法后，对 data 的改变不会再触发周期函数，说明此时 vue 实例已经解除了事件监听以及和 dom 的绑定，但是 dom 结构依然存在
+
+	beforeCreate 双向绑定未完成------------this.consumeTopicArr.push() 报错：Cannot read property 'push' of undefined
+	Created  双向绑定已完成----------------this.consumeTopicArr.push() 不会报错
+			在创建vue对象时，当html渲染之前就触发；但是注意，全局vue.js不强制刷新或者重启时只创建一次，也就是说，created()只会触发一次；
+
+	beforeMount 页面还没有被渲染---------helloword未显示
+	mounted 挂载完成，页面已经被渲染---------显示helloword 可以执行ajax操作
+
+	activated()：在vue对象存活的情况下，进入当前存在activated()函数的页面时，一进入页面就触发；可用于初始化页面数据等
+	
+	deactivated: 包含keep-alive组件的页面隐藏或者被替换成新的页面时执行
+	
+	
+	
+	
+	
+	
+	
+
+
+vue cli  
+	创建项目：vue init webpack projectname
+	
