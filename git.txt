@@ -21,7 +21,7 @@ Git
 	git checkout -b brachname // 创建+切换分支
 	git merge brachname //合并指定分支到当前分支
 	git branch -d brachname // 删除分支 如果要丢弃一个没有被合并过的分支，可以通过git branch -D <name>强行删除。
-	git push origin --delete <BranchName> // 删除远程分支
+	git push origin --delete BranchName // 删除远程分支
 	git log --pretty=oneline //查看提交历史
 	git reflog //查看命令历史
 	git reset --hard commit_id //改变版本
@@ -32,6 +32,10 @@ Git
 	git reflog
 	git reset --soft HEAD^ 撤销上次commit
 	git reset --soft HEAD~1 撤销上次commit
+	
+	git remote -v  查看远程仓库地址
+	
+	git remote set-url origin git@gitlab.com:wwkjddyh/evalve.git  修改远程仓库地址
 
 
 1) 切换到基础分支，如主干

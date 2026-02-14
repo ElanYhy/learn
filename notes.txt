@@ -138,19 +138,12 @@ quartz
 		可以对异常进行全局处理
 		404异常 NoHandlerFoundException：需要@EnableWebMvc，以及spring.mvc.throw-exception-if-no-handler-found: true
 
-	
-WebSecurityConfigurerAdapter
-	@EnableWebSecurity
 
 抽象类/抽象工厂模式注入失败：@EnableAutoConfiguration自动装配
 	@Resource
     private Map<String, BaseFormula> formulaMap;
 	IncompresibleFluid incom = (IncompresibleFluid) formulaMap.get("incompresibleFluid");
 	
-@PropertySource(value = {"demo/props/demo.properties"})
-@ConfigurationProperties(prefix = "demo")
-组合使用，可以将属性文件与一个Java类绑定，将属性文件中的变量值注入到该Java类的成员变量中	
-
 reflect
 	Java程序在运行状态可以动态的获取类的所有属性和方法，并实例化该类，调用方法的功能 
 	Class cls = Class.forName("apple");
@@ -409,12 +402,29 @@ Feign
 	}
 	
 	#开启断路器 FeignAutoConfiguration cloud 2020.0.1版本
+	#开启断路器 FeignAutoConfiguration
 	#feign:
 	#  hystrix:
 	#    enabled: true
 	feign:
 	  circuitbreaker:
-		enabled: true
+		enabled: true # 从而使fallback生效
+	  client:
+		config:
+		  # 全局配置
+		  default:
+			connectTimeout: 5000
+			readTimeout: 5000
+		  # 实例配置，consumer01@feignclient中的value，也就是服务名
+		  consumer01:
+			connectTimeout: 2000
+			readTimeout: 2000
+	  httpclient: # 默认HttpUrlConnection，可以为HttpClient也可以是Okhttp
+		enabled: false
+		max-connections: 200 # 最大连接数
+		max-connections-per-route: 50 # 每个路由的最大访问量
+	  okhttp:
+		enabled: true # 使用okhttp客户端
 
 
 
@@ -793,6 +803,16 @@ Spring Security实现登录的功能需要做哪些操作：
 		BCryptPasswordEncoder()
 	————————————————
 	原文链接：https://blog.csdn.net/weixin_43461520/article/details/107941983/
+WebSecurityConfigurerAdapter
+@EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true) // 开启方法权限校验
+
+@PreAuthorize("hasRole('ROLE_ADMIN')")
+
+eladmin 项目：使用原生security （loadUserByUsername 时，通过mapToGrantedAuthorities 方法设置权限，可以使用@PreAuthorize，hasRole等）
+blade 项目：借鉴Security，封装了Secure模块，采用JWT做Token认证（ExpressionParser 自定义el表达式上下文）
+
+
 	
 会话
 	用户认证通过后，为了避免用户的每次操作都进行认证可将用户的信息保证在会话中。
@@ -844,13 +864,41 @@ bootstrap.yml与application.yml
 		proxyBeanMethods = true 代理增强，不生成新的bean，直接从IOC容器取
 		proxyBeanMethods = false 不进行增强，每次生成新的bean，启动快
 
-@ConfigurationProperties 属性绑定
+@ConfigurationProperties和@Value注解用于获取配置文件中的属性定义并绑定到Java Bean或属性中
 	@Component
 	@ConfigurationProperties(prefix = "task.pool")
-	===
+	等价于
 	@EnableConfigurationProperties(AsyncTaskProperties.class)
 	@ConfigurationProperties(prefix = "task.pool")
 	
+	@EnableConfigurationProperties等价于类上的@Component，主要用于让第三方jar包的ConfigurationProperties生效。
+	@Component标注的类是无法注入到spring容器中的，这时我们可以用@EnableConfigurationProperties来代替@Component
+
+
+@PropertySource(value = {"demo/props/demo.properties"})
+@ConfigurationProperties(prefix = "demo")
+组合使用，可以将属性文件与一个Java类绑定，将属性文件中的变量值注入到该Java类的成员变量中	
+
+	@Bean
+    // 注解方法时，@ConfigurationProperties注解在方法返回时生效，将参数注入返回的Bean中
+    // 注解类时，需要生成属性set、get方法，@ConfigurationProperties才会生效
+    @ConfigurationProperties(prefix = "spring.datasource.druid.master")
+    public DataSource masterDataSource(DruidProperties properties) {
+        DruidDataSource druidDataSource = DruidDataSourceBuilder.create().build();
+        return properties.dataSource(druidDataSource);
+    }
+	
+	@Component
+	@ConfigurationProperties(prefix = "spring.datasource.druid")
+	@Data
+	public class DruidProperties {
+		private int initialSize;
+
+		private int minIdle;
+		...
+	}
+
+
 @Conditional
 	条件装配：满足Conditional指定的条件，则进行组件注入
 
@@ -1254,9 +1302,36 @@ Elasticseach(8.4.1)
 			}
 
 
+数据权限
+
+hbase、hive
+
+
+TiDB
 
 
 
+分库分表
+	spring-share
+	
+
+多数据源
+
+
+
+Redis
+
+spring cache
+	@Cacheable(value = "queryDocByFuzzy2", key = "#p0 + #p1 + #p2")
+	配置类：
+	@EnableCaching
+	@EnableConfigurationProperties(RedisProperties.class)
+	CachingConfigurerSupport
+		keyGenerator：未设置key时的key生成方式
+		CacheManager：序列化方式、过期时间
+
+
+	
 
 
 	
