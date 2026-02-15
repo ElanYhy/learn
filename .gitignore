@@ -1,0 +1,28 @@
+# --- 系统与临时文件 ---
+# 忽略 Java 虚拟机崩溃日志
+hs_err_pid*
+reply_ads_*.log
+
+# 忽略 Office 临时锁定文件
+~$*
+
+# 忽略 Windows 缩略图缓存
+Thumbs.db
+
+# --- Python 相关 ---
+# 忽略 Python 编译后的字节码
+__pycache__/
+*.py[cod]
+
+# 忽略 Python 虚拟环境
+venv/
+.venv/
+
+# --- Java/IDE 相关 ---
+# 忽略编译后的 .class 文件
+*.class
+# 忽略 IDE 配置文件（如 IntelliJ 或 VS Code）
+.idea/
+.vscode/
+out/
+target/
